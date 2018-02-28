@@ -22,6 +22,10 @@
 #include <gua/guacamole.hpp>
 #include <gua/utils/Trackball.hpp>
 
+#include <lamure/vt/ren/CutUpdate.h>
+
+
+
 #define COUNT 5
 
 // forward mouse interaction to trackball

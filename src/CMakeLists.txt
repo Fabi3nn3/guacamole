@@ -136,7 +136,7 @@ ADD_LIBRARY( guacamole SHARED
     ${GUACAMOLE_SHADERS_GLSL}
 )
 
-TARGET_INCLUDE_DIRECTORIES(guacamole PUBLIC ${INCLUDE_PATHS})
+TARGET_INCLUDE_DIRECTORIES(guacamole PUBLIC ${INCLUDE_PATHS} /home/veno3560/lamure/install/include/ )
 # suppress warnings for external includes
 TARGET_INCLUDE_DIRECTORIES(guacamole SYSTEM PUBLIC ${INCLUDE_PATHS_EXTERNAL})
 
@@ -150,7 +150,8 @@ TARGET_LINK_LIBRARIES( guacamole
                        optimized ${SCHISM_CORE_LIBRARY} debug ${SCHISM_CORE_LIBRARY_DEBUG}
                        optimized ${SCHISM_GL_CORE_LIBRARY} debug ${SCHISM_GL_CORE_LIBRARY_DEBUG}
                        optimized ${SCHISM_GL_UTIL_LIBRARY} debug ${SCHISM_GL_UTIL_LIBRARY_DEBUG}
-                       optimized ${SCHISM_INPUT_LIBRARY} debug ${SCHISM_INPUT_LIBRARY_DEBUG})
+                       optimized ${SCHISM_INPUT_LIBRARY} debug ${SCHISM_INPUT_LIBRARY_DEBUG}
+                       optimized "/home/veno3560/lamure/install/lib/liblamure_virtual_texturing.so")
 
 # link static libraries,
 IF (MSVC)
