@@ -18,69 +18,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.             *
  *                                                                            *
  ******************************************************************************/
-
 // class header
-#include <gua/databases/TextureDatabase.hpp>
-#include <gua/renderer/Texture2D.hpp>
-#include <gua/renderer/Texture3D.hpp>
+#include <gua/renderer/VirtualTexturingPass.hpp>
 
 // guacamole headers
-#include <gua/utils/Directory.hpp>
+#include <gua/renderer/VirtualTexturingRenderer.hpp>
+#include <gua/renderer/Pipeline.hpp>
+#include <gua/databases.hpp>
+#include <gua/utils/Logger.hpp>
+
+#include <gua/config.hpp>
+
+#include <scm/gl_core/shader_objects.h>
 
 // external headers
 #include <sstream>
-#include <future>
-#include <iostream>
-#include <cstdint>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include <gua/renderer/Texture2D.hpp>
-
-#define GUACAMOLE_VT 1
+#include <fstream>
+#include <regex>
+#include <list>
 
 namespace gua {
 
-void TextureDatabase::load(std::string const& filename) {
-  boost::filesystem::path fp(filename);
-  std::string extension(fp.extension().string());
-  boost::algorithm::to_lower(extension);
+////////////////////////////////////////////////////////////////////////////////
 
-  if (extension == ".png"
-      || extension == ".jpg"
-      || extension == ".jpeg"
-      || extension == ".bmp"
-      || extension == ".dds"
-      || extension == ".tif"
-      || extension == ".tga"
-#if GUACAMOLE_VT
-      || extension == ".atlas"
-#endif
-      ) {
+VirtualTexturingPassDescription::VirtualTexturingPassDescription()
+  : PipelinePassDescription()
+{
+  needs_color_buffer_as_input_ = false;
+  writes_only_color_buffer_ = false;
+  enable_for_shadows_ = false;
+  rendermode_ = RenderMode::Custom;
+}
 
-    auto exists = TextureDatabase::instance()->lookup(filename);
-    if (exists)
-      return;
 
-    // else
-    textures_loading_.push_back(std::async(std::launch::async, [filename]() -> std::string {
+////////////////////////////////////////////////////////////////////////////////
 
-      auto default_tex = TextureDatabase::instance()->lookup("gua_default_texture");
-      if (default_tex) {
-        gua::TextureDatabase::instance()->add(filename, default_tex);
-      }
+std::shared_ptr<PipelinePassDescription> VirtualTexturingPassDescription::make_copy() const {
+  return std::make_shared<VirtualTexturingPassDescription>(*this);
+}
 
-      auto image = gua::load_image_2d(filename, true);
+////////////////////////////////////////////////////////////////////////////////
 
-      instance()->add(filename, std::make_shared<Texture2D>(image, 1,
-            scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
-                                        scm::gl::WRAP_REPEAT,
-                                        scm::gl::WRAP_REPEAT)));
-      return filename;
-    }));
-  } else if (extension == ".vol") {
-    instance()->add(filename, std::make_shared<Texture3D>(filename, true));
-  }
+PipelinePass VirtualTexturingPassDescription::make_pass(RenderContext const& ctx, SubstitutionMap& substitution_map)
+{
+  PipelinePass pass{ *this, ctx, substitution_map };
+
+  auto renderer = std::make_shared<VirtualTexturingRenderer>();
+  renderer->set_global_substitution_map(substitution_map);
+
+  pass.process_ = [renderer](
+    PipelinePass& pass, PipelinePassDescription const& desc, Pipeline & pipe) {
+    renderer->render(pipe, desc);
+  };
+
+  return pass;
 }
 
 }

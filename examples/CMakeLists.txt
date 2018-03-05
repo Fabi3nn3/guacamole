@@ -56,6 +56,11 @@ IF (GUACAMOLE_EXAMPLES)
     add_subdirectory(lod_simple)
   ENDIF (${PLUGIN_guacamole-lod})
 
+  # virtual texturing example requires virtual texturing-plugin
+  IF (${PLUGIN_guacamole-vt})
+    add_subdirectory(virtual_texturing)
+  ENDIF (${PLUGIN_guacamole-vt})
+  
   # time-varying volume example requires tv_3-plugin
   IF (${PLUGIN_guacamole-tv_3})
     add_subdirectory(time_varying_volume)
