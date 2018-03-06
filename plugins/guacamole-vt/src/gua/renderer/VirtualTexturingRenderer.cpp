@@ -22,6 +22,7 @@
 // class header
 #include <gua/renderer/VirtualTexturingRenderer.hpp>
 #include <gua/renderer/VirtualTexturingPass.hpp>
+#include <gua/renderer/VTTexture2D.hpp>
 
 // guacamole headers
 #include <gua/renderer/Pipeline.hpp>
@@ -54,6 +55,7 @@
 #include <lamure/ren/controller.h>
 */
 
+//#include <lamure/vt/ren/CutUpdate.h>
 #include <boost/assign/list_of.hpp>
 
 namespace gua {
@@ -95,6 +97,10 @@ namespace gua {
 
     RenderContext const& ctx(pipe.get_context());
 
+    auto scm_device = ctx.render_device;
+    auto scm_context = ctx.render_context;
+
+
     ///////////////////////////////////////////////////////////////////////////
     //  retrieve current view state
     ///////////////////////////////////////////////////////////////////////////
@@ -106,6 +112,24 @@ namespace gua {
     std::string cpu_query_name_plod_total = "CPU: Camera uuid: " + std::to_string(pipe.current_viewstate().viewpoint_uuid) + " / LodPass";
     pipe.begin_cpu_query(cpu_query_name_plod_total);
     
+
+    // if(lamure_cut_update is not running -> run)
+
+    //with lamure: start_reading_cut
+
+    //with gua: get_front_idx (index texture cpu representation as uin8_t*) (gives you the lamure::vt::ren::Cut*)
+
+    //with gua: get_physical texture mem slots from cut
+
+    // either: update GPU representation directly similar to lamure, but with gua resources (in your VTTexture class)
+    // OR: copy all the cpu memory you received into own CPU buffers in the VTTexture object
+
+    // with lamure: stop reading cut
+
+    // if you did not update the GPU textures before: update them now with the copied CPU representation
+
+
+
 
 
     std::cout << "Render Frame in VT-Renderer\n";
