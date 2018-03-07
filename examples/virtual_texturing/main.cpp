@@ -30,7 +30,7 @@
 #include <gua/renderer/VirtualTexturingPass.hpp>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 
-#include <lamure/vt/ren/VTController.h>
+//#include <lamure/vt/ren/VTController.h>
 
 int main(int argc, char** argv) {
 
@@ -56,15 +56,15 @@ int main(int argc, char** argv) {
 
   //BEFORE ANY VT IS LOADED: TELL THE CONTROLLER HOW MUCH MEMORY SHOULD BE ALLOCATED FOR THE BUDGET!
 
-  lamure::vt::VTController* vt_controller_p = (lamure::vt::VTController*) lamure::vt::VTController::get_instance();
+  /*lamure::vt::VTController* vt_controller_p = (lamure::vt::VTController*) lamure::vt::VTController::get_instance();
   
   vt_controller_p->cpu_budget_in_mb = 4096;
   vt_controller_p->gpu_budget_in_mb = 1024;
-  vt_controller_p->cut_update_budget_in_mb = 10;
+  vt_controller_p->cut_update_budget_in_mb = 10;*/
 
 
   //LOAD TEXTURE ATLAS
-  gua::TextureDatabase::instance()->load("MYFILE.atlas");
+  //gua::TextureDatabase::instance()->load("MYFILE.atlas");
 
 
 

@@ -47,7 +47,7 @@ namespace gua {
  * This class allows to load texture data from a file and bind the
  * texture to an OpenGL context.
  */
-class GUA_VT_DLL VTTexture2D : public Texture {
+class GUA_DLL VTTexture2D : public Texture {
  public:
   /**
    * Constructor.
