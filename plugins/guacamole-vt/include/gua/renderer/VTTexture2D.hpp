@@ -100,6 +100,10 @@ class GUA_DLL VTTexture2D : public Texture {
                                             scm::gl::WRAP_REPEAT,
                                             scm::gl::WRAP_REPEAT));
 
+//Constructor 
+//get path to config file and atlas
+//retrieve size from backend
+ //VTTexture2D(std::string const& file_config, std::string const& file_atlas);
   ///@{
   /**
    * Gets the size.
@@ -119,6 +123,8 @@ class GUA_DLL VTTexture2D : public Texture {
   unsigned height_;
 
  private:
+  //std::string _file_config;
+  //std::string _file_atlas;
 };
 
 scm::gl::texture_image_data_ptr load_image_2d(std::string const& file,

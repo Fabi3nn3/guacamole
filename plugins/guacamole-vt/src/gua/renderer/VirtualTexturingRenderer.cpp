@@ -40,6 +40,8 @@
 #include <gua/config.hpp>
 #include <scm/gl_core/shader_objects.h>
 
+#include <lamure/vt/ren/CutUpdate.h>
+
 // external headers
 #include <sstream>
 #include <fstream>
@@ -55,7 +57,6 @@
 #include <lamure/ren/controller.h>
 */
 
-//#include <lamure/vt/ren/CutUpdate.h>
 #include <boost/assign/list_of.hpp>
 
 namespace gua {
@@ -92,6 +93,10 @@ namespace gua {
 
   }
 
+  void VirtualTexturingRenderer::initialize_physical_texture(){
+    //width & heigth = calc_phy_tex_size();
+    
+  }
   ///////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::render(gua::Pipeline& pipe, PipelinePassDescription const& desc) {
 

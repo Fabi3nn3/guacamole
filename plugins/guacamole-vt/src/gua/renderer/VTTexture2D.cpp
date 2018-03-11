@@ -73,6 +73,12 @@ VTTexture2D::VTTexture2D(std::string const& file,
       height_(image_ ? image_->mip_level(0).size().y : 0) {
 }
 
+/*VTTexture2D::VTTexture2D(std::string const& file_config, std::string const& file_atlas):
+_file_config(file_config),
+_file_atlas(file_atlas)
+{}*/
+
+
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
 

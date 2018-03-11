@@ -30,6 +30,11 @@
 #include <gua/renderer/VirtualTexturingPass.hpp>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 
+#include <lamure/vt/VTConfig.h>
+#include <lamure/vt/ren/CutUpdate.h>
+#include <lamure/vt/ren/CutDatabase.h>
+
+
 //#include <lamure/vt/ren/VTController.h>
 
 int main(int argc, char** argv) {
@@ -53,6 +58,30 @@ int main(int argc, char** argv) {
   gua::math::vec2 last_mouse_pos(0.f);
   int button_state = -1;
 
+
+
+
+    std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
+    std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
+    vt::VTConfig::CONFIG_PATH = file_config;
+
+    //calls read_config when creating instance
+    vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
+    //get_instance = same object!!
+
+    uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
+    uint16_t view_id = vt::CutDatabase::get_instance().register_view();
+    uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
+
+    uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
+
+    auto *cut_update = new vt::CutUpdate();
+    cut_update->start();
+
+    uint32_t phy_tex_dim_width = vt::VTConfig::get_instance().get_phys_tex_px_width();
+    std::cout << "Phy Tex Dim: "<< phy_tex_dim_width << std::endl;
+    //create phy tex -> .atlas possible
+    create_physical_texture(phy_tex_dim_width);
 
   //BEFORE ANY VT IS LOADED: TELL THE CONTROLLER HOW MUCH MEMORY SHOULD BE ALLOCATED FOR THE BUDGET!
 

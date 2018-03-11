@@ -48,6 +48,8 @@ namespace gua {
 
     void render(Pipeline& pipe, PipelinePassDescription const& desc);
     void set_global_substitution_map(SubstitutionMap const& smap);
+    void initialize_physical_texture();
+    void initialize_index_texture();
 
   private:  //shader related auxiliary methods
     void          _create_gpu_resources(gua::RenderContext const& ctx,
