@@ -30,10 +30,13 @@
 #include <gua/renderer/VirtualTexturingPass.hpp>
 #include <scm/gl_util/manipulators/trackball_manipulator.h>
 
+#include <gua/renderer/VTTexture2D.hpp>
+
 #include <lamure/vt/VTConfig.h>
 #include <lamure/vt/ren/CutUpdate.h>
 #include <lamure/vt/ren/CutDatabase.h>
-
+#include <gua/renderer/VirtualTexturingRenderer.hpp>
+#include <gua/renderer/VTTexture2D.hpp>
 
 //#include <lamure/vt/ren/VTController.h>
 
@@ -66,8 +69,16 @@ int main(int argc, char** argv) {
     vt::VTConfig::CONFIG_PATH = file_config;
 
     //calls read_config when creating instance
-    vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
-    //get_instance = same object!!
+
+     GLint max_tex_layers;
+     glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
+
+     GLint max_tex_px_width_gl;
+     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
+ 
+    std::cout << "Defined Physical Texture with: " << max_tex_layers << " Layers and " << max_tex_px_width_gl<< " max_px_width_gl" << std::endl;
+
+    vt::VTConfig::get_instance().define_size_physical_texture((int32_t) max_tex_layers,(int32_t) max_tex_px_width_gl);
 
     uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
     uint16_t view_id = vt::CutDatabase::get_instance().register_view();
@@ -81,7 +92,20 @@ int main(int argc, char** argv) {
     uint32_t phy_tex_dim_width = vt::VTConfig::get_instance().get_phys_tex_px_width();
     std::cout << "Phy Tex Dim: "<< phy_tex_dim_width << std::endl;
     //create phy tex -> .atlas possible
-    create_physical_texture(phy_tex_dim_width);
+
+
+    //own function
+    vt::VTConfig::FORMAT_TEXTURE phy_tex_format = vt::VTConfig::get_instance().get_format_texture();
+    uint32_t physical_texture_width = vt::VTConfig::get_instance().get_phys_tex_px_width();
+    uint16_t physical_texture_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
+    gua::math::vec2ui physical_texture_dim = gua::math::vec2ui(physical_texture_width);
+    std::cout <<"phy tex dim: "<< physical_texture_dim << endl;
+
+    
+    gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
+
+
+    //gua::VTTexture2D physical_texture(phy_tex_dim_width, phy_tex_dim_width,vt::VTConfig::get_instance().get_format_texture(),vt::VTConfig::get_instance().get_phys_tex_layers()+1,);
 
   //BEFORE ANY VT IS LOADED: TELL THE CONTROLLER HOW MUCH MEMORY SHOULD BE ALLOCATED FOR THE BUDGET!
 
@@ -119,6 +143,7 @@ int main(int argc, char** argv) {
   pipe->add_pass(std::make_shared<gua::LightVisibilityPassDescription>());
   pipe->add_pass(std::make_shared<gua::ResolvePassDescription>());
 
+  
   camera->set_pipeline_description(pipe);
 
   pipe->get_resolve_pass()->tone_mapping_exposure(5.f);
@@ -147,6 +172,8 @@ int main(int argc, char** argv) {
 
   gua::Renderer renderer;
 
+  gua::VirtualTexturingRenderer vtrenderer;
+  vtrenderer.apply_cutupdate(primary_context_id);
   //application loop
   gua::events::MainLoop loop;
   gua::events::Ticker ticker(loop, 1.0 / 500.0);

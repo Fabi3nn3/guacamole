@@ -34,6 +34,7 @@
 #include <gua/renderer/ShaderProgram.hpp>
 #include <gua/renderer/ResourceFactory.hpp>
 
+
 namespace gua {
 
   class MaterialShader;
@@ -50,6 +51,7 @@ namespace gua {
     void set_global_substitution_map(SubstitutionMap const& smap);
     void initialize_physical_texture();
     void initialize_index_texture();
+    void apply_cutupdate(uint16_t ctx_id);
 
   private:  //shader related auxiliary methods
     void          _create_gpu_resources(gua::RenderContext const& ctx,

@@ -36,6 +36,7 @@
 
 #include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/data/imaging/texture_image_data.h>
+#include <lamure/vt/VTConfig.h>
 
 #include <iostream>
 
@@ -73,11 +74,21 @@ VTTexture2D::VTTexture2D(std::string const& file,
       height_(image_ ? image_->mip_level(0).size().y : 0) {
 }
 
-/*VTTexture2D::VTTexture2D(std::string const& file_config, std::string const& file_atlas):
-_file_config(file_config),
-_file_atlas(file_atlas)
-{}*/
+VTTexture2D::VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE format):
+width_(dim.x),
+height_(dim.y),
+layers_(layers)
+{
+ //create_texture_2d(dim,format,0,layers);
 
+  /*
+  create_texture_2d(const math::vec2ui& in_size,
+                                                      const data_format   in_format,
+                                                      const unsigned      in_mip_levels = 1,
+                                                      const unsigned      in_array_layers = 1,
+                                                      const unsigned      in_samples = 1);
+  */
+}
 
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};

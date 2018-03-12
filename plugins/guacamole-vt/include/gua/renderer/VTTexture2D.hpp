@@ -28,7 +28,7 @@
 #include <gua/renderer/Texture.hpp>
 #include <gua/math/math.hpp>
 #include <gua/utils/Logger.hpp>
-
+#include <lamure/vt/VTConfig.h>
 #include <scm/gl_util/data/imaging/texture_image_data.h>
 
 // external headers
@@ -103,7 +103,7 @@ class GUA_DLL VTTexture2D : public Texture {
 //Constructor 
 //get path to config file and atlas
 //retrieve size from backend
- //VTTexture2D(std::string const& file_config, std::string const& file_atlas);
+VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE format);
   ///@{
   /**
    * Gets the size.
@@ -121,10 +121,12 @@ class GUA_DLL VTTexture2D : public Texture {
   scm::gl::texture_image_data_ptr image_ = nullptr;
   unsigned width_;
   unsigned height_;
+  unsigned layers_;
 
  private:
-  //std::string _file_config;
-  //std::string _file_atlas;
+  std::string _file_config;
+  std::string _file_atlas;
+  scm::shared_ptr<scm::gl::render_device> _device;
 };
 
 scm::gl::texture_image_data_ptr load_image_2d(std::string const& file,

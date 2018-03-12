@@ -41,7 +41,8 @@
 #include <scm/gl_core/shader_objects.h>
 
 #include <lamure/vt/ren/CutUpdate.h>
-
+#include <lamure/vt/ren/CutDatabase.h>
+#include <lamure/vt/common.h>
 // external headers
 #include <sstream>
 #include <fstream>
@@ -94,9 +95,60 @@ namespace gua {
   }
 
   void VirtualTexturingRenderer::initialize_physical_texture(){
-    //width & heigth = calc_phy_tex_size();
+    
     
   }
+
+  void VirtualTexturingRenderer::apply_cutupdate(uint16_t ctx_id){
+      std::cout << "Context id: " << ctx_id << std::endl;
+      vt::CutDatabase *cut_db = &vt::CutDatabase::get_instance();
+      cut_db->start_reading();
+
+      for(vt::cut_map_entry_type cut_entry : (*cut_db->get_cut_map()))
+      {
+        vt::Cut *cut = cut_db->start_reading_cut(cut_entry.first);
+
+        if(!cut->is_drawn())
+        {
+            cut_db->stop_reading_cut(cut_entry.first);
+            continue;
+        }
+        //TODO
+        //update_index_texture(Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
+        for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
+        {
+          const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
+
+          if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
+          {
+               if(mem_slot_updated == nullptr)
+               {
+                   std::cerr << "Mem slot at " << position_slot_updated.second << " is null" << std::endl;
+               }
+               else
+               {
+                   std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
+                   std::cerr << "Mem slot #" << mem_slot_updated->position << std::endl;
+                   std::cerr << "Tile id: " << mem_slot_updated->tile_id << std::endl;
+                   std::cerr << "Locked: " << mem_slot_updated->locked << std::endl;
+                   std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
+                   std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
+               }
+               throw std::runtime_error("updated mem slot inconsistency");
+          }
+          //TODO
+          //update_physical_texture_blockwise(ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+
+        }
+        cut_db->stop_reading_cut(cut_entry.first);
+        
+      }
+      cut_db->stop_reading();
+      //TODO
+      //_context_resources[ctx_id]->_render_context->sync();
+  }
+
+
   ///////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::render(gua::Pipeline& pipe, PipelinePassDescription const& desc) {
 
@@ -137,7 +189,7 @@ namespace gua {
 
 
 
-    std::cout << "Render Frame in VT-Renderer\n";
+    //std::cout << "Render Frame in VT-Renderer\n";
 
     pipe.end_cpu_query(cpu_query_name_plod_total); 
     
