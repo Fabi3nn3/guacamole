@@ -49,6 +49,7 @@ namespace gua {
  */
 class GUA_DLL VTTexture2D : public Texture {
  public:
+  VTTexture2D();
   /**
    * Constructor.
    *
@@ -104,6 +105,7 @@ class GUA_DLL VTTexture2D : public Texture {
 //get path to config file and atlas
 //retrieve size from backend
 VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE format);
+
   ///@{
   /**
    * Gets the size.
@@ -114,6 +116,9 @@ VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE
   unsigned height() const override { return height_; }
 
   void upload_to(RenderContext const& context) const override;
+  void initialize(RenderContext *context);
+  void initialize_index_texture(RenderContext const& ctx, uint64_t cut_id);
+  void initialize_physical_texture(RenderContext const& ctx);
 
   ///@}
 
@@ -127,7 +132,15 @@ VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE
   std::string _file_config;
   std::string _file_atlas;
   scm::shared_ptr<scm::gl::render_device> _device;
-};
+  //scm::gl::render_device_ptr                                                        _scm_device;
+  //scm::gl::render_context_ptr                                                       _scm_context;
+  scm::math::vec2ui                                                                 _index_texture_dimension;
+  scm::gl::texture_2d_ptr                                                           _index_texture;
+  scm::gl::texture_2d_ptr                                                           _physical_texture;
+  scm::math::vec2ui                                                                 _physical_texture_dimension;
+  scm::gl::sampler_state_ptr                                                        _filter_nearest;
+  scm::gl::sampler_state_ptr                                                        _filter_linear;
+};  
 
 scm::gl::texture_image_data_ptr load_image_2d(std::string const& file,
                                               bool create_mips);

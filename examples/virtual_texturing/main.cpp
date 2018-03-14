@@ -38,6 +38,8 @@
 #include <gua/renderer/VirtualTexturingRenderer.hpp>
 #include <gua/renderer/VTTexture2D.hpp>
 
+
+
 //#include <lamure/vt/ren/VTController.h>
 
 int main(int argc, char** argv) {
@@ -102,7 +104,16 @@ int main(int argc, char** argv) {
     std::cout <<"phy tex dim: "<< physical_texture_dim << endl;
 
     
-    gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
+    //gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
+
+    
+    //gua::RenderContext const& ctx(pipe->get_context());
+    gua::VirtualTexturingRenderer vtrenderer;
+    gua::VTTexture2D vttexture;
+    //vttexture.initialize();
+   // vttexture.initialize_index_texture(cut_id);
+    //vttexture.initialize_physical_texture();
+    
 
 
     //gua::VTTexture2D physical_texture(phy_tex_dim_width, phy_tex_dim_width,vt::VTConfig::get_instance().get_format_texture(),vt::VTConfig::get_instance().get_phys_tex_layers()+1,);
@@ -172,8 +183,8 @@ int main(int argc, char** argv) {
 
   gua::Renderer renderer;
 
-  gua::VirtualTexturingRenderer vtrenderer;
-  vtrenderer.apply_cutupdate(primary_context_id);
+ 
+  //vtrenderer.apply_cutupdate(primary_context_id);
   //application loop
   gua::events::MainLoop loop;
   gua::events::Ticker ticker(loop, 1.0 / 500.0);

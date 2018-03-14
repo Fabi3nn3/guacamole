@@ -37,10 +37,15 @@
 #include <scm/gl_util/data/imaging/texture_loader.h>
 #include <scm/gl_util/data/imaging/texture_image_data.h>
 #include <lamure/vt/VTConfig.h>
+#include <lamure/vt/ren/CutUpdate.h>
+#include <lamure/vt/ren/CutDatabase.h>
 
 #include <iostream>
 
 namespace gua {
+
+VTTexture2D::VTTexture2D()
+{}
 
 VTTexture2D::VTTexture2D(scm::gl::texture_image_data_ptr image,
                      unsigned mipmap_layers,
@@ -74,6 +79,7 @@ VTTexture2D::VTTexture2D(std::string const& file,
       height_(image_ ? image_->mip_level(0).size().y : 0) {
 }
 
+
 VTTexture2D::VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE format):
 width_(dim.x),
 height_(dim.y),
@@ -90,6 +96,34 @@ layers_(layers)
   */
 }
 
+void VTTexture2D::initialize(RenderContext *context){
+    std::cout << "yeah";
+
+    //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
+    //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE); 
+  }
+
+  void VTTexture2D::initialize_index_texture(RenderContext const& ctx, uint64_t cut_id){
+
+    auto render_device = ctx.render_device;
+    auto render_context = ctx.render_context;
+
+    uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
+    _index_texture_dimension = scm::math::vec2ui(size_index_texture, size_index_texture);
+    _index_texture = render_device->create_texture_2d(_index_texture_dimension, scm::gl::FORMAT_RGBA_8UI);
+
+  }
+
+  void VTTexture2D::initialize_physical_texture(RenderContext const& ctx){
+
+    auto render_device = ctx.render_device;
+    auto render_context = ctx.render_context;
+
+    _physical_texture_dimension = scm::math::vec2ui(vt::VTConfig::get_instance().get_phys_tex_tile_width(), vt::VTConfig::get_instance().get_phys_tex_tile_width());
+    _physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 0, vt::VTConfig::get_instance().get_phys_tex_layers() + 1);
+    
+  }
+
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
 
@@ -105,6 +139,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
     ctex.texture = context.render_device->create_texture_2d(
         math::vec2ui(width_, height_), color_format_, mipmap_layers_);
   }
+  //initialize(*context);
 
   if (ctex.texture) {
     ctex.sampler_state =

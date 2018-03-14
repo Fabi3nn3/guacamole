@@ -94,11 +94,7 @@ namespace gua {
 
   }
 
-  void VirtualTexturingRenderer::initialize_physical_texture(){
-    
-    
-  }
-
+  
   void VirtualTexturingRenderer::apply_cutupdate(uint16_t ctx_id){
       std::cout << "Context id: " << ctx_id << std::endl;
       vt::CutDatabase *cut_db = &vt::CutDatabase::get_instance();

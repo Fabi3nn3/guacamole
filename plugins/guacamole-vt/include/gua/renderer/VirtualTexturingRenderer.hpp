@@ -34,6 +34,8 @@
 #include <gua/renderer/ShaderProgram.hpp>
 #include <gua/renderer/ResourceFactory.hpp>
 
+#include <scm/core.h>
+
 
 namespace gua {
 
@@ -49,8 +51,6 @@ namespace gua {
 
     void render(Pipeline& pipe, PipelinePassDescription const& desc);
     void set_global_substitution_map(SubstitutionMap const& smap);
-    void initialize_physical_texture();
-    void initialize_index_texture();
     void apply_cutupdate(uint16_t ctx_id);
 
   private:  //shader related auxiliary methods
@@ -61,13 +61,19 @@ namespace gua {
 
   private:  //out-of-core related auxiliary methods
   
-  private:  //member variables
+  private:
     unsigned                                                                          previous_frame_count_;
-
-    //CPU resources
     SubstitutionMap                                                                   global_substitution_map_;
     ResourceFactory                                                                   factory_;
-
+    scm::shared_ptr<scm::core>                                                        _scm_core;
+    scm::gl::sampler_state_ptr                                                        _filter_nearest;
+    scm::gl::sampler_state_ptr                                                        _filter_linear;
+    //scm::math::vec2ui                                                                 _index_texture_dimension;
+    //scm::gl::texture_2d_ptr                                                           _index_texture;
+    //scm::gl::texture_2d_ptr                                                           _physical_texture;
+    //scm::math::vec2ui                                                                 _physical_texture_dimension;
+    //scm::gl::render_device_ptr                                                        _scm_device;
+    //scm::gl::render_context_ptr                                                       _scm_context;
   };
 
 }
