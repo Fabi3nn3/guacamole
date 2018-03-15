@@ -54,8 +54,8 @@ namespace gua {
     void apply_cutupdate(uint16_t ctx_id);
 
   private:  //shader related auxiliary methods
-    void          _create_gpu_resources(gua::RenderContext const& ctx,
-                                        scm::math::vec2ui const& render_target_dims); 
+    void          _create_gpu_resources(gua::RenderContext const& ctx/*,
+                                        scm::math::vec2ui const& render_target_dims*/); 
     
     void          _check_for_resource_updates(gua::Pipeline const& pipe, RenderContext const& ctx);
 

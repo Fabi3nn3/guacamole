@@ -115,7 +115,7 @@ void VTTexture2D::initialize(RenderContext *context){
   }
 
   void VTTexture2D::initialize_physical_texture(RenderContext const& ctx){
-
+    std::cout << "phy tex wohoo";
     auto render_device = ctx.render_device;
     auto render_context = ctx.render_context;
 

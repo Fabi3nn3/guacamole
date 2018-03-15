@@ -72,11 +72,11 @@ int main(int argc, char** argv) {
 
     //calls read_config when creating instance
 
-     GLint max_tex_layers;
-     glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
+     GLint max_tex_layers=5;
+//     glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
 
-     GLint max_tex_px_width_gl;
-     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
+     GLint max_tex_px_width_gl=1200;
+//     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
  
     std::cout << "Defined Physical Texture with: " << max_tex_layers << " Layers and " << max_tex_px_width_gl<< " max_px_width_gl" << std::endl;
 
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
   pipe->get_resolve_pass()->tone_mapping_exposure(5.f);
 
   pipe->get_resolve_pass()->background_mode(gua::ResolvePassDescription::BackgroundMode::SKYMAP_TEXTURE);
-  pipe->get_resolve_pass()->background_texture("data/textures/envlightmap.jpg");
+  //pipe->get_resolve_pass()->background_texture("data/textures/envlightmap.jpg");
 
   //init window and window behaviour
   auto window = std::make_shared<gua::GlfwWindow>();

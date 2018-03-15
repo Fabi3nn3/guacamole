@@ -70,9 +70,11 @@ namespace gua {
 
 
   ///////////////////////////////////////////////////////////////////////////////
-  void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx,
-                                           scm::math::vec2ui const& render_target_dims) {
+  void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx/*,
+                                           scm::math::vec2ui const& render_target_dims*/) {
     //invalidation before first write
+    gua::VTTexture2D vttex;
+    vttex.initialize_physical_texture(ctx);
     previous_frame_count_ = UINT_MAX;
   }
 
@@ -152,7 +154,8 @@ namespace gua {
 
     auto scm_device = ctx.render_device;
     auto scm_context = ctx.render_context;
-
+    //per frame
+    _create_gpu_resources(ctx);
 
     ///////////////////////////////////////////////////////////////////////////
     //  retrieve current view state
