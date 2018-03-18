@@ -49,14 +49,16 @@
 #include <regex>
 #include <list>
 
-/*
+#include <lamure/vt/VTConfig.h>
+
+
 #include <lamure/ren/camera.h>
 #include <lamure/ren/policy.h>
 #include <lamure/ren/dataset.h>
 #include <lamure/ren/model_database.h>
 #include <lamure/ren/cut_database.h>
 #include <lamure/ren/controller.h>
-*/
+
 
 #include <boost/assign/list_of.hpp>
 
@@ -70,13 +72,21 @@ namespace gua {
 
 
   ///////////////////////////////////////////////////////////////////////////////
-  void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx/*,
+  void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx, uint64_t cut_id/*,
                                            scm::math::vec2ui const& render_target_dims*/) {
     //invalidation before first write
     gua::VTTexture2D vttex;
-    vttex.initialize_physical_texture(ctx);
     previous_frame_count_ = UINT_MAX;
+    vttex.initialize_index_texture(ctx, cut_id);
+    vttex.initialize_physical_texture(ctx);
+
+    //not quite sure ob das so funktioniert bzw die stelle richtig ist
+    _filter_nearest = ctx.render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
+    _filter_linear = ctx.render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE);
+
   }
+
+  //BRAUCHEN WIR REGISTER CONTEXT IN CUTUPADTE???
 
   /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,6 +100,10 @@ namespace gua {
   }
 */
 
+  void VirtualTexturingRenderer::init() {
+    //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
+    //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE);
+  }
 
   /////////////////////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::set_global_substitution_map(SubstitutionMap const& smap) {
@@ -97,8 +111,9 @@ namespace gua {
   }
 
   
-  void VirtualTexturingRenderer::apply_cutupdate(uint16_t ctx_id){
+  void VirtualTexturingRenderer::apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id){
       std::cout << "Context id: " << ctx_id << std::endl;
+      auto render_context = ctx.render_context;
       vt::CutDatabase *cut_db = &vt::CutDatabase::get_instance();
       cut_db->start_reading();
 
@@ -112,7 +127,7 @@ namespace gua {
             continue;
         }
         //TODO
-        //update_index_texture(Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
+        update_index_texture(ctx, cut_id, vt::Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
         for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
         {
           const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
@@ -135,7 +150,7 @@ namespace gua {
                throw std::runtime_error("updated mem slot inconsistency");
           }
           //TODO
-          //update_physical_texture_blockwise(ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+          update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
 
         }
         cut_db->stop_reading_cut(cut_entry.first);
@@ -143,8 +158,47 @@ namespace gua {
       }
       cut_db->stop_reading();
       //TODO
-      //_context_resources[ctx_id]->_render_context->sync();
+      //render_context->scm::gl::sync();
   }
+
+  void VirtualTexturingRenderer::update_index_texture(gua::RenderContext const& ctx,uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu) {
+
+    VTTexture2D _index_texture;
+    
+    scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
+    //scm::math::vec3ui dimensions = scm::math::vec3ui(_dataset_resources[dataset_id]->_index_texture_dimension, 1);
+    //TODO: schlauer machen !!
+    uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
+    scm::math::vec2ui _index_texture_dimension = scm::math::vec2ui(size_index_texture, size_index_texture);
+    _index_texture.update_sub_data(ctx, scm::gl::texture_region(origin, _index_texture_dimension), 0, scm::gl::FORMAT_RGBA_8UI, buf_cpu);
+
+  }
+
+  void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
+    VTTexture2D _physical_texture;
+    
+    size_t slots_per_texture = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width();
+    size_t layer = slot_position / slots_per_texture;
+    size_t rel_slot_position = slot_position - layer * slots_per_texture;
+    size_t x_tile = rel_slot_position % vt::VTConfig::get_instance().get_phys_tex_tile_width();
+    size_t y_tile = rel_slot_position / vt::VTConfig::get_instance().get_phys_tex_tile_width();
+
+    scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
+    scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
+
+    _physical_texture.update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
+
+  }
+
+  //bin mir nicht sicher ob wir das benötigen
+  /*
+  lamure::context_t VirtualTexturingRenderer::register_context_in_cut_update(gua::RenderContext const& ctx) {
+    lamure::ren::controller* controller = lamure::ren::controller::get_instance(); 
+    if (previous_frame_count_ != ctx.framecount) {
+      controller->reset_system();
+    }
+    return controller->deduce_context_id(ctx.id);
+  }*/
 
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -155,7 +209,7 @@ namespace gua {
     auto scm_device = ctx.render_device;
     auto scm_context = ctx.render_context;
     //per frame
-    _create_gpu_resources(ctx);
+    //_create_gpu_resources(ctx,cut_id);
 
     ///////////////////////////////////////////////////////////////////////////
     //  retrieve current view state
@@ -184,6 +238,14 @@ namespace gua {
 
     // if you did not update the GPU textures before: update them now with the copied CPU representation
 
+
+    //BRAUCHEN WIR DAS ?!
+    /*
+    //create lamure camera out of gua camera values
+    lamure::ren::controller* controller = lamure::ren::controller::get_instance();
+    lamure::ren::cut_database* cuts = lamure::ren::cut_database::get_instance();
+    lamure::ren::model_database* database = lamure::ren::model_database::get_instance();
+    */
 
 
 

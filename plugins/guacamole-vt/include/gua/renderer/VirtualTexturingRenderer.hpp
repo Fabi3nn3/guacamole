@@ -34,6 +34,7 @@
 #include <gua/renderer/ShaderProgram.hpp>
 #include <gua/renderer/ResourceFactory.hpp>
 
+
 #include <scm/core.h>
 
 
@@ -51,10 +52,15 @@ namespace gua {
 
     void render(Pipeline& pipe, PipelinePassDescription const& desc);
     void set_global_substitution_map(SubstitutionMap const& smap);
-    void apply_cutupdate(uint16_t ctx_id);
+    void apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id);
+    void update_index_texture(gua::RenderContext const& ctx, uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu);
+    void update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position);
+    void init();
 
   private:  //shader related auxiliary methods
-    void          _create_gpu_resources(gua::RenderContext const& ctx/*,
+    //not sure about this one
+  //lamure::context_t register_context_in_cut_update(gua::RenderContext const& ctx);
+    void          _create_gpu_resources(gua::RenderContext const& ctx,uint64_t cut_id/*,
                                         scm::math::vec2ui const& render_target_dims*/); 
     
     void          _check_for_resource_updates(gua::Pipeline const& pipe, RenderContext const& ctx);
