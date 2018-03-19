@@ -18,58 +18,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.             *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef GUA_TEXTURE_DATABASE_HPP
-#define GUA_TEXTURE_DATABASE_HPP
+#ifndef GUA_VIRTUAL_TEXTURING_PASS_HPP
+#define GUA_VIRTUAL_TEXTURING_PASS_HPP
 
 // guacamole headers
-#include <gua/platform.hpp>
-#include <gua/utils/Singleton.hpp>
-#include <gua/databases/Database.hpp>
-#include <gua/renderer/Texture.hpp>
-
-#include <gua/renderer/VTTexture2D.hpp>
-
-#include <future>
+#include <gua/renderer/VT.hpp>
+#include <gua/renderer/PipelinePass.hpp>
 
 namespace gua {
 
-/**
- * A data base for textures.
- *
- * This Database stores texture data. It can be accessed via string
- * identifiers.
- *
- * \ingroup gua_databases
- */
-  class GUA_DLL TextureDatabase : public Database<Texture>,
-                                  public Singleton<TextureDatabase> {
- public:
+  class GUA_VT_DLL VirtualTexturingPassDescription : public PipelinePassDescription {
 
-  /**
-   * Loads a texture file to the database.
-   *
-   * This method loads textures to the data base.
-   *
-   * \param id  An absolute or relative path to the
-   *            directory containing texture files.
-   */
-  void load(std::string const& id);
+  public : // typedefs, enums
 
-  friend class Singleton<TextureDatabase>;
+   friend class Pipeline;
 
-  std::vector<std::shared_ptr<Texture>> get_virtual_textures() ;
+  public :
 
- private:
-  // this class is a Singleton --- private c'tor and d'tor
-  TextureDatabase() = default;
-  ~TextureDatabase() = default;
+    VirtualTexturingPassDescription();
 
-  std::vector<std::future<std::string>> textures_loading_;
-  std::unordered_map<std::size_t, std::string> vt_texture_names;
+    std::shared_ptr<PipelinePassDescription> make_copy() const override;
+    PipelinePass make_pass(RenderContext const&, SubstitutionMap&) override;
 
 };
 
 }
 
-#endif  // GUA_TEXTURE_DATABASE_HPP
+#endif  // GUA_VIRTUAL_TEXTURING_PASS_HPP

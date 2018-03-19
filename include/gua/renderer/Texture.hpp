@@ -128,7 +128,17 @@ class GUA_DLL Texture {
 
   virtual void upload_to(RenderContext const& context) const = 0;
 
-  std::size_t uuid() { return uuid_; }
+  std::size_t uuid() const { return uuid_; }
+
+  virtual void update(RenderContext const& context) const {};
+
+  void add_instance_to_texture_database(std::string const& filename,
+                                        scm::gl::sampler_state_desc const& s_state_desc);
+    /*instance()->add(filename, std::make_shared<VTTexture2D>(filename,
+          scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
+                                      scm::gl::WRAP_REPEAT,
+                                      scm::gl::WRAP_REPEAT)));
+    */
 
  protected:
 

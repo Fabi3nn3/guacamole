@@ -9,8 +9,8 @@ include(find_lamure_virtual_texturing)
 ###############################################################################
 # determine source files
 ###############################################################################
-FILE(GLOB         GUA_VT_RENDERER_SRC       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/gua/renderer/*.cpp)
-FILE(GLOB         GUA_VT_RENDERER_INC       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/gua/renderer/*.hpp)
+FILE(GLOB         GUA_VT_RENDERER_SRC       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ../../src/gua/renderer/*.cpp)
+FILE(GLOB         GUA_VT_RENDERER_INC       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ../../include/gua/renderer/*.hpp)
 
 FILE(GLOB_RECURSE GUA_VT_SHADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*)
 

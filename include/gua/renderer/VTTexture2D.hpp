@@ -1,0 +1,152 @@
+/******************************************************************************
+ * guacamole - delicious VR                                                   *
+ *                                                                            *
+ * Copyright: (c) 2011-2013 Bauhaus-Universität Weimar                        *
+ * Contact:   felix.lauer@uni-weimar.de / simon.schneegans@uni-weimar.de      *
+ *                                                                            *
+ * This program is free software: you can redistribute it and/or modify it    *
+ * under the terms of the GNU General Public License as published by the Free *
+ * Software Foundation, either version 3 of the License, or (at your option)  *
+ * any later version.                                                         *
+ *                                                                            *
+ * This program is distributed in the hope that it will be useful, but        *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY *
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License   *
+ * for more details.                                                          *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with this program. If not, see <http://www.gnu.org/licenses/>.             *
+ *                                                                            *
+ ******************************************************************************/
+
+#ifndef GUA_VTTEXTURE2D_HPP
+#define GUA_VTTEXTURE2D_HPP
+
+// guacamole headers
+#include <gua/platform.hpp>
+#include <gua/renderer/RenderContext.hpp>
+#include <gua/renderer/Texture.hpp>
+#include <gua/math/math.hpp>
+#include <gua/utils/Logger.hpp>
+#include <lamure/vt/VTConfig.h>
+#include <scm/gl_util/data/imaging/texture_image_data.h>
+
+// external headers
+#include <string>
+#include <vector>
+
+#include <mutex>
+#include <thread>
+#include <memory>
+
+namespace gua {
+
+/**
+ * A class representing a texture.
+ *
+ * This class allows to load texture data from a file and bind the
+ * texture to an OpenGL context.
+ */
+class GUA_DLL VTTexture2D : public Texture {
+ public:
+  //VTTexture2D();
+  /**
+   * Constructor.
+   *
+   * This constructs a new texture from a scm::texture_image_data_ptr
+   *
+   * \param image_data       The image which contains the texture data.
+   * \param state_descripton The sampler state for the loaded texture.
+   */
+
+/*
+  VTTexture2D(scm::gl::texture_image_data_ptr image_data,
+            // bool generate_mipmaps = false,
+            unsigned mipmap_layers = 1,
+            scm::gl::sampler_state_desc const& state_descripton =
+                scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
+                                            scm::gl::WRAP_REPEAT,
+                                            scm::gl::WRAP_REPEAT));
+*/
+  /**
+   * Constructor.
+   *
+   * This constructs a new texture with the given parameters.
+   *
+   * \param width            The width of the resulting texture.
+   * \param height           The height of the resulting texture.
+   * \param color_format     The color format of the resulting
+   *                         texture.
+   * \param state_descripton The sampler state for the loaded texture.
+   */
+/*
+  VTTexture2D(unsigned width,
+            unsigned height,
+            scm::gl::data_format color_format = scm::gl::FORMAT_RGB_32F,
+            unsigned mipmap_layers = 1,
+            scm::gl::sampler_state_desc const& state_descripton =
+                scm::gl::sampler_state_desc(scm::gl::FILTER_MIN_MAG_MIP_LINEAR,
+                                            scm::gl::WRAP_CLAMP_TO_EDGE,
+                                            scm::gl::WRAP_CLAMP_TO_EDGE));
+*/
+  /**
+   * Constructor.
+   *
+   * This constructs a new texture from a given file.
+   *
+   * \param file             The file which contains the texture data.
+   * \param state_descripton The sampler state for the loaded texture.
+   */
+  VTTexture2D(std::string const& file,
+              scm::gl::sampler_state_desc const& state_descripton =
+              scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
+                                          scm::gl::WRAP_REPEAT,
+                                          scm::gl::WRAP_REPEAT));
+
+
+
+//Constructor 
+//get path to config file and atlas
+//retrieve size from backend
+//VTTexture2D(gua::math::vec2ui dim, uint16_t layers, vt::VTConfig::FORMAT_TEXTURE format);
+
+  ///@{
+  /**
+   * Gets the size.
+   *
+   * Returns the size of the Texture2D.
+   */
+  unsigned width() const override { return width_; }
+  unsigned height() const override { return height_; }
+
+  void upload_to(RenderContext const& context) const override;
+  void initialize(RenderContext *context);
+  void initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const;
+  void initialize_physical_texture(RenderContext const& ctx) const;
+
+  void update(RenderContext const& context) const override;
+
+  ///@}
+
+ protected:
+  scm::gl::texture_image_data_ptr image_ = nullptr;
+  unsigned width_;
+  unsigned height_;
+  unsigned layers_;
+
+ private:
+  std::string _file_config;
+  std::string _file_atlas;
+  scm::shared_ptr<scm::gl::render_device> _device;
+  //scm::gl::render_device_ptr                                                        _scm_device;
+  //scm::gl::render_context_ptr                                                       _scm_context;
+  mutable scm::math::vec2ui                                                         _index_texture_dimension;
+  //mutable scm::gl::texture_2d_ptr                                                   _index_texture;
+  //mutable scm::gl::texture_2d_ptr                                                   _physical_texture;
+  mutable scm::math::vec2ui                                                         _physical_texture_dimension;
+  scm::gl::sampler_state_ptr                                                        _filter_nearest;
+  scm::gl::sampler_state_ptr                                                        _filter_linear;
+};  
+
+}
+#endif  // GUA_VTTEXTURE2D_HPP

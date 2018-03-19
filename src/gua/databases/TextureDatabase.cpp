@@ -24,6 +24,7 @@
 #include <gua/renderer/Texture2D.hpp>
 #include <gua/renderer/Texture3D.hpp>
 
+
 // guacamole headers
 #include <gua/utils/Directory.hpp>
 
@@ -32,12 +33,16 @@
 #include <future>
 #include <iostream>
 #include <cstdint>
+#include <memory>
+
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <gua/renderer/Texture2D.hpp>
-
 #define GUACAMOLE_VT 1
+
+
 
 namespace gua {
 
@@ -53,9 +58,6 @@ void TextureDatabase::load(std::string const& filename) {
       || extension == ".dds"
       || extension == ".tif"
       || extension == ".tga"
-#if GUACAMOLE_VT
-      || extension == ".atlas"
-#endif
       ) {
 
     auto exists = TextureDatabase::instance()->lookup(filename);
@@ -63,7 +65,7 @@ void TextureDatabase::load(std::string const& filename) {
       return;
 
     // else
-    textures_loading_.push_back(std::async(std::launch::async, [filename]() -> std::string {
+    textures_loading_.push_back(std::async(std::launch::async, [filename, extension]() -> std::string {
 
       auto default_tex = TextureDatabase::instance()->lookup("gua_default_texture");
       if (default_tex) {
@@ -76,11 +78,50 @@ void TextureDatabase::load(std::string const& filename) {
             scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
                                         scm::gl::WRAP_REPEAT,
                                         scm::gl::WRAP_REPEAT)));
+      
       return filename;
     }));
   } else if (extension == ".vol") {
     instance()->add(filename, std::make_shared<Texture3D>(filename, true));
+  } else if (extension == ".atlas") {
+#if GUACAMOLE_VT
+
+
+    instance()->add(filename, std::make_shared<VTTexture2D>(filename,
+          scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,
+                                      scm::gl::WRAP_REPEAT,
+                                      scm::gl::WRAP_REPEAT)));
+  
+
+
+  auto existing_vt = TextureDatabase::instance()->lookup(filename);
+
+  if(!existing_vt) {
+    std::cout << "VT failed to be created!\n";
   }
+
+  vt_texture_names[existing_vt->uuid()] = filename;
+
+#endif
+  }
+}
+
+
+
+
+std::vector<std::shared_ptr<Texture> > TextureDatabase::get_virtual_textures() {
+  std::vector< std::shared_ptr<Texture> > virtual_texture_ptrs;
+
+  for(auto const& vt_name : vt_texture_names) {
+    auto vt_exists = TextureDatabase::instance()->lookup(vt_name.second);
+    if (vt_exists) {
+
+      virtual_texture_ptrs.push_back(vt_exists);
+    }
+  }
+
+  return virtual_texture_ptrs;
+
 }
 
 }

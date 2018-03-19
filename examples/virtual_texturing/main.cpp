@@ -65,11 +65,60 @@ int main(int argc, char** argv) {
 
 
 
+  auto load_mat = [](std::string const& file){
+    auto desc(std::make_shared<gua::MaterialShaderDescription>());
+    desc->load_from_file(file);
+    auto shader(std::make_shared<gua::MaterialShader>(file, desc));
+    gua::MaterialShaderDatabase::instance()->add(shader);
+    return shader->make_new_material();
+  };
+
+  gua::TriMeshLoader loader;
+
+
+
+  //teapot_mat->set_uniform("ColorMap", std::string());
+
+
 
     std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
     std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
+
+
     vt::VTConfig::CONFIG_PATH = file_config;
 
+
+    std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
+    vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
+
+
+
+
+    auto vt_material(load_mat("data/materials/VirtualTexturing.gmd"));
+
+    std::string const vt_path = "data/textures/envmap.jpg";
+    gua::TextureDatabase::instance()->load(file_atlas);
+
+
+    vt_material->set_uniform("ColorMap", std::string(file_atlas));
+
+
+
+    auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
+    auto teapot(loader.create_geometry_from_file(
+        "teapot", "data/objects/teapot.obj",
+        vt_material,
+        gua::TriMeshLoader::NORMALIZE_POSITION |
+        gua::TriMeshLoader::NORMALIZE_SCALE) );
+
+    graph.add_node("/transform", teapot);
+
+
+    //gua::TextureDatabase::instance()->load(file_atlas);
+
+    
+
+/*
     //calls read_config when creating instance
 
      GLint max_tex_layers=5;
@@ -82,9 +131,7 @@ int main(int argc, char** argv) {
 
     vt::VTConfig::get_instance().define_size_physical_texture((int32_t) max_tex_layers,(int32_t) max_tex_px_width_gl);
 
-    uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
-    uint16_t view_id = vt::CutDatabase::get_instance().register_view();
-    uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
+
 
     uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
@@ -103,14 +150,13 @@ int main(int argc, char** argv) {
     gua::math::vec2ui physical_texture_dim = gua::math::vec2ui(physical_texture_width);
     std::cout <<"phy tex dim: "<< physical_texture_dim << endl;
 
-    
+    */
     //gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
 
     
     //gua::RenderContext const& ctx(pipe->get_context());
-    gua::VirtualTexturingRenderer vtrenderer;
-    gua::VTTexture2D vttexture;
-    //vttexture.initialize();
+    //gua::VirtualTexturingRenderer vtrenderer;
+    //gua::VTTexture2D vttexture;
    // vttexture.initialize_index_texture(cut_id);
     //vttexture.initialize_physical_texture();
     
@@ -160,7 +206,7 @@ int main(int argc, char** argv) {
   pipe->get_resolve_pass()->tone_mapping_exposure(5.f);
 
   pipe->get_resolve_pass()->background_mode(gua::ResolvePassDescription::BackgroundMode::SKYMAP_TEXTURE);
-  //pipe->get_resolve_pass()->background_texture("data/textures/envlightmap.jpg");
+  //pipe->get_resolve_pass()->background_texture(file_atlas);
 
   //init window and window behaviour
   auto window = std::make_shared<gua::GlfwWindow>();

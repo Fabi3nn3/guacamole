@@ -40,6 +40,7 @@ list (REMOVE_ITEM GUACAMOLE_RENDERER_INC
   ../include/gua/renderer/PBRRessource.hpp
 )
 ENDIF (NOT GUACAMOLE_PBR_SUPPORT)
+
 IF (NOT GUACAMOLE_GLFW3)
 list (REMOVE_ITEM GUACAMOLE_RENDERER_INC
   ../include/gua/renderer/GlfwWindow.hpp
@@ -136,7 +137,7 @@ ADD_LIBRARY( guacamole SHARED
     ${GUACAMOLE_SHADERS_GLSL}
 )
 
-TARGET_INCLUDE_DIRECTORIES(guacamole PUBLIC ${INCLUDE_PATHS} /home/veno3560/lamure/install/include/ )
+TARGET_INCLUDE_DIRECTORIES(guacamole PUBLIC ${INCLUDE_PATHS} /home/mido9230/lamure/install/include/ )
 # suppress warnings for external includes
 TARGET_INCLUDE_DIRECTORIES(guacamole SYSTEM PUBLIC ${INCLUDE_PATHS_EXTERNAL})
 
@@ -151,7 +152,7 @@ TARGET_LINK_LIBRARIES( guacamole
                        optimized ${SCHISM_GL_CORE_LIBRARY} debug ${SCHISM_GL_CORE_LIBRARY_DEBUG}
                        optimized ${SCHISM_GL_UTIL_LIBRARY} debug ${SCHISM_GL_UTIL_LIBRARY_DEBUG}
                        optimized ${SCHISM_INPUT_LIBRARY} debug ${SCHISM_INPUT_LIBRARY_DEBUG}
-                       optimized "/home/veno3560/lamure/install/lib/liblamure_virtual_texturing.so")
+                       optimized "/home/mido9230/lamure/install/lib/liblamure_virtual_texturing.so")
 
 # link static libraries,
 IF (MSVC)

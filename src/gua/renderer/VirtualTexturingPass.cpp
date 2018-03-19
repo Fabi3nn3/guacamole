@@ -18,58 +18,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.             *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef GUA_TEXTURE_DATABASE_HPP
-#define GUA_TEXTURE_DATABASE_HPP
+// class header
+#include <gua/renderer/VirtualTexturingPass.hpp>
 
 // guacamole headers
-#include <gua/platform.hpp>
-#include <gua/utils/Singleton.hpp>
-#include <gua/databases/Database.hpp>
-#include <gua/renderer/Texture.hpp>
+#include <gua/renderer/VirtualTexturingRenderer.hpp>
+#include <gua/renderer/Pipeline.hpp>
+#include <gua/databases.hpp>
+#include <gua/utils/Logger.hpp>
 
-#include <gua/renderer/VTTexture2D.hpp>
+#include <gua/config.hpp>
 
-#include <future>
+#include <scm/gl_core/shader_objects.h>
+
+// external headers
+#include <sstream>
+#include <fstream>
+#include <regex>
+#include <list>
 
 namespace gua {
 
-/**
- * A data base for textures.
- *
- * This Database stores texture data. It can be accessed via string
- * identifiers.
- *
- * \ingroup gua_databases
- */
-  class GUA_DLL TextureDatabase : public Database<Texture>,
-                                  public Singleton<TextureDatabase> {
- public:
+////////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * Loads a texture file to the database.
-   *
-   * This method loads textures to the data base.
-   *
-   * \param id  An absolute or relative path to the
-   *            directory containing texture files.
-   */
-  void load(std::string const& id);
-
-  friend class Singleton<TextureDatabase>;
-
-  std::vector<std::shared_ptr<Texture>> get_virtual_textures() ;
-
- private:
-  // this class is a Singleton --- private c'tor and d'tor
-  TextureDatabase() = default;
-  ~TextureDatabase() = default;
-
-  std::vector<std::future<std::string>> textures_loading_;
-  std::unordered_map<std::size_t, std::string> vt_texture_names;
-
-};
-
+VirtualTexturingPassDescription::VirtualTexturingPassDescription()
+  : PipelinePassDescription()
+{
+  needs_color_buffer_as_input_ = false;
+  writes_only_color_buffer_ = false;
+  enable_for_shadows_ = false;
+  rendermode_ = RenderMode::Custom;
 }
 
-#endif  // GUA_TEXTURE_DATABASE_HPP
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::shared_ptr<PipelinePassDescription> VirtualTexturingPassDescription::make_copy() const {
+  return std::make_shared<VirtualTexturingPassDescription>(*this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+PipelinePass VirtualTexturingPassDescription::make_pass(RenderContext const& ctx, SubstitutionMap& substitution_map)
+{
+  PipelinePass pass{ *this, ctx, substitution_map };
+
+  auto renderer = std::make_shared<VirtualTexturingRenderer>();
+  renderer->set_global_substitution_map(substitution_map);
+
+  pass.process_ = [renderer](
+    PipelinePass& pass, PipelinePassDescription const& desc, Pipeline & pipe) {
+    renderer->render(pipe, desc);
+  };
+
+  return pass;
+}
+
+}
