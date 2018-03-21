@@ -205,6 +205,8 @@ boost::optional<UniformType> parse_uniform_type(std::string const& type) {
     return boost::make_optional(UniformType::SAMPLERCUBE);
   if (type == "usampler2D")
     return boost::make_optional(UniformType::USAMPLER2D);
+  if (type == "sampler2DArray")
+    return boost::make_optional(UniformType::SAMPLER2DARRAY);
   return boost::none;
 }
 

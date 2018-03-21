@@ -122,8 +122,6 @@ void VTTexture2D::initialize(RenderContext *context){
 
 
 
-    vt::CutDatabase::get_instance().register_cut(0, 0, 0);
-
 
     std::cout << "Before retrieving cut\n";
     uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
@@ -200,7 +198,7 @@ void VTTexture2D::initialize(RenderContext *context){
 
 
     std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
-    ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 0, vt::VTConfig::get_instance().get_phys_tex_layers() + 1) ;
+    ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 1, vt::VTConfig::get_instance().get_phys_tex_layers() + 1) ;
 
     std::cout << "done creating physical texture\n";
     

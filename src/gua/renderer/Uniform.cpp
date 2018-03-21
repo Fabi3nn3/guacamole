@@ -147,6 +147,8 @@ UniformValue UniformValue::create_from_string_and_type(std::string const& value,
       return UniformValue(value);
     case UniformType::USAMPLER2D:
       return UniformValue(value);
+    case UniformType::SAMPLER2DARRAY:
+      return UniformValue(value);
     //case UniformType::SAMPLER3D:
     //  return UniformValue(value);
     //case UniformType::SAMPLERCUBE:

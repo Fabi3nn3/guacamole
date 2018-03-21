@@ -165,6 +165,8 @@ namespace gua {
 
     auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
 
+    //ctx.physical_texture
+
     for( auto const& vt_ptr : vector_of_vt_ptr ) {
     
 

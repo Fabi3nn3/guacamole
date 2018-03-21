@@ -92,6 +92,7 @@ enum class UniformType {
   SAMPLER3D,
   SAMPLERCUBE,
   USAMPLER2D,
+  SAMPLER2DARRAY,
   NONE
 };
 

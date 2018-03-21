@@ -86,6 +86,15 @@ void TextureDatabase::load(std::string const& filename) {
   } else if (extension == ".atlas") {
 #if GUACAMOLE_VT
 
+    std::string const physical_texture_default_name = "gua_physical_texture_2d";
+    auto physical_texture_2d = TextureDatabase::instance()->lookup(physical_texture_default_name);
+
+    if(!physical_texture_2d) {
+      /*instance()->add(physical_texture_default_name, std::make_shared<PhysicalTexture2D>(physical_texture_default_name,
+            scm::gl::sampler_state_desc(scm::gl::FILTER_MIN_MAG_LINEAR,
+                                        scm::gl::WRAP_REPEAT,
+                                        scm::gl::WRAP_REPEAT)));*/
+    }
 
     instance()->add(filename, std::make_shared<VTTexture2D>(filename,
           scm::gl::sampler_state_desc(scm::gl::FILTER_ANISOTROPIC,

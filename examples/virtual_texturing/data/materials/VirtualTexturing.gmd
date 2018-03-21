@@ -14,7 +14,7 @@
 
           gua_alpha = 1.0;
 
-          gua_color = color.rgb / 255.0;
+          gua_color = color.rgb / 30.0;
           gua_metalness = 0.0;
           gua_emissivity = 1.0;
 
@@ -27,7 +27,12 @@
           "name" : "ColorMap",
           "type" : "usampler2D",
           "value" : "0"
-        }
+        },
+	{
+	  "name"  : "PhysicalTexture2D",
+	  "type"  : "sampler2DArray",
+	  "value" : "0"
+	}
       ]
     }
     ]
