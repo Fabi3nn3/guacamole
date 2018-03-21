@@ -70,9 +70,7 @@ namespace gua {
 
 
   //////////////////////////////////////////////////////////////////////////////
-  VirtualTexturingRenderer::VirtualTexturingRenderer() 
-  {}
-
+  VirtualTexturingRenderer::VirtualTexturingRenderer(){}
 
   ///////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx, uint64_t cut_id/*,
@@ -89,11 +87,13 @@ namespace gua {
 */
   }
 
-  void VirtualTexturingRenderer::init() {
-    //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
-    //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE);
-  }
+ /*void VirtualTexturingRenderer::start_cut_update(gua::RenderContext const& ctx)
+ {
+    auto *cut_update = &vt::CutUpdate::get_instance();
+    cut_update->start();
+    ctx.set_cut_update_started();
 
+ }*/
   /////////////////////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::set_global_substitution_map(SubstitutionMap const& smap) {
 

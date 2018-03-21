@@ -155,22 +155,7 @@ layers_(layers)
 */
   }
 
-  void VTTexture2D::initialize_physical_texture(RenderContext const& ctx) const{
-    auto render_device = ctx.render_device;
-    auto render_context = ctx.render_context;
-
-
-    _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
-
-
-
-    std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
-    ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 1, vt::VTConfig::get_instance().get_phys_tex_layers() + 1) ;
-
-    std::cout << "done creating physical texture\n";
-    
-  }
-
+  
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
   {

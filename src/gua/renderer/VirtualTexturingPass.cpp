@@ -64,6 +64,7 @@ PipelinePass VirtualTexturingPassDescription::make_pass(RenderContext const& ctx
   PipelinePass pass{ *this, ctx, substitution_map };
 
   auto renderer = std::make_shared<VirtualTexturingRenderer>();
+  //renderer->start_cut_update(ctx);
   renderer->set_global_substitution_map(substitution_map);
 
   pass.process_ = [renderer](

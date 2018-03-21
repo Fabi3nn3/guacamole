@@ -65,6 +65,7 @@ struct GUA_DLL RenderContext {
   * c'tor
   */
   RenderContext();
+  void set_cut_update_started();
 
   /**
    * The schism render device associated with this context.
@@ -107,6 +108,9 @@ struct GUA_DLL RenderContext {
   * Resources associated with this context
   */
   InstanceCollection resources;
+
+  //cutupdate is started
+  bool cut_update_started;
 
   class Mesh
   {

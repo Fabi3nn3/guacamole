@@ -50,13 +50,12 @@ namespace gua {
   public:
 
     VirtualTexturingRenderer();
-
+    /*void start_cut_update(gua::RenderContext const& ctx);*/
     void render(Pipeline& pipe, PipelinePassDescription const& desc);
     void set_global_substitution_map(SubstitutionMap const& smap);
     void apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id);
     void update_index_texture(gua::RenderContext const& ctx, uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu);
     void update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position);
-    void init();
 
   private:  //shader related auxiliary methods
     //not sure about this one

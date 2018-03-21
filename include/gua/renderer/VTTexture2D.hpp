@@ -55,7 +55,6 @@ class GUA_DLL VTTexture2D : public Texture {
 
   void upload_to(RenderContext const& context) const override;
   void initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const;
-  void initialize_physical_texture(RenderContext const& ctx) const;
 
   void update(RenderContext const& context) const override;
 
