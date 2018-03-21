@@ -29,6 +29,7 @@
 #include <gua/renderer/Texture.hpp>
 
 #include <gua/renderer/VTTexture2D.hpp>
+#include <gua/renderer/PhysicalTexture2D.hpp>
 
 #include <future>
 
