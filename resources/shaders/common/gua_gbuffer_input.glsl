@@ -98,11 +98,11 @@ uint gua_get_flags() {
     return uint(texelFetch(usampler2D(gua_gbuffer_flags), ivec2(gl_FragCoord.xy), 0).r);
 }
 
-// flags -----------------------------------------------------------------------
-uint gua_get_vt_attribs(vec2 frag_pos) {
-    return texture2D(usampler2D(gua_gbuffer_flags), frag_pos).rgba;
+// vt -----------------------------------------------------------------------
+vec4 gua_get_vt_attribs(vec2 frag_pos) {
+    return texture2D(usampler2D(gua_gbuffer_vt_attribs), frag_pos).rgba;
 }
 
-uint gua_get_flags() {
-    return texelFetch(usampler2D(gua_gbuffer_flags), ivec2(gl_FragCoord.xy), 0).rgba;
+vec4 gua_get_vt_attribs() {
+    return texelFetch(usampler2D(gua_gbuffer_vt_attribs), ivec2(gl_FragCoord.xy), 0).rgba;
 }

@@ -101,28 +101,22 @@ namespace gua {
 
   
   void VirtualTexturingRenderer::apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id){
-      std::cout << "Context id: " << ctx_id << std::endl;
       auto render_context = ctx.render_context;
       vt::CutDatabase *cut_db = &vt::CutDatabase::get_instance();
       cut_db->start_reading();
 
       for(vt::cut_map_entry_type cut_entry : (*cut_db->get_cut_map()))
       {
-        std::cout <<"Cut Entry.first:" << cut_entry.first << "\n";
-
-        /*if(cut_entry.first == 0 ){*/
+        if(cut_entry.first == 0 ){
 
           vt::Cut *cut = cut_db->start_reading_cut(cut_entry.first);
 
           if(!cut->is_drawn())
           {
-              std::cout<<"hello from !cut is_drawn\n";
               cut_db->stop_reading_cut(cut_entry.first);
               continue;
           }
-          std::cout << "bevor updating\n";
           update_index_texture(ctx, cut_id, vt::Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
-          std::cout << "nach updating\n";
 
           /*for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
           {
@@ -151,7 +145,7 @@ namespace gua {
           }*/
           cut_db->stop_reading_cut(cut_entry.first);
           
-        /*}*/ 
+        }
        /* else
         {
             cut_db->stop_reading_cut(cut_entry.first);
@@ -172,7 +166,6 @@ namespace gua {
 
       //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
       uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
-      std::cout << "Size IndexTexture: " << size_index_texture << "\n";
       
       scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
       scm::math::vec3ui _index_texture_dimension = scm::math::vec3ui(size_index_texture, size_index_texture, 1);
@@ -229,7 +222,6 @@ namespace gua {
     auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
     std::vector<uint32_t> feedback_buffer(phys_width * phys_width * phys_layers, UINT32_MAX);
 
-    std::cout << "fbbuffer address: "<< &feedback_buffer[0] << "& inhalt: " << feedback_buffer[1];
     vt::CutUpdate::get_instance().feedback(&feedback_buffer[0]);
 
 

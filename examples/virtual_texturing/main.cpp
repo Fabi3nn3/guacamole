@@ -75,15 +75,7 @@ int main(int argc, char** argv) {
 
   gua::TriMeshLoader loader;
 
-
-
   //teapot_mat->set_uniform("ColorMap", std::string());
-
-
-
-
-
-    //cut_update->stop();
 
     std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
     std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
@@ -93,6 +85,17 @@ int main(int argc, char** argv) {
 
 
     std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
+
+  //GPU Infos wrong - why? 
+   GLint max_tex_layers;
+   glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
+
+   GLint max_tex_px_width_gl;
+   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
+
+   std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
+
+
     vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
 
     uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
@@ -138,11 +141,7 @@ int main(int argc, char** argv) {
 /*
     //calls read_config when creating instance
 
-     GLint max_tex_layers=5;
-//     glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
 
-     GLint max_tex_px_width_gl=1200;
-//     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
  
     std::cout << "Defined Physical Texture with: " << max_tex_layers << " Layers and " << max_tex_px_width_gl<< " max_px_width_gl" << std::endl;
 

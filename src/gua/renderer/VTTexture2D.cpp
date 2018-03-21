@@ -45,33 +45,7 @@
 #include <condition_variable>
 
 namespace gua {
-/*
-VTTexture2D::VTTexture2D()
-{}
 
-VTTexture2D::VTTexture2D(scm::gl::texture_image_data_ptr image,
-                     unsigned mipmap_layers,
-                     scm::gl::sampler_state_desc const& state_descripton)
-    : Texture(image->format(),
-              image->format(),
-              mipmap_layers,
-              state_descripton),
-      image_(image),
-      width_(image ? image->mip_level(0).size().x : 0),
-      height_(image ? image->mip_level(0).size().y : 0) {
-}
-
-VTTexture2D::VTTexture2D(unsigned width,
-                     unsigned height,
-                     scm::gl::data_format color_format,
-                     unsigned mipmap_layers,
-                     scm::gl::sampler_state_desc const& state_descripton)
-    : Texture(color_format, mipmap_layers, state_descripton),
-      image_(nullptr),
-      width_(width),
-      height_(height) {
-}
-*/
 VTTexture2D::VTTexture2D(std::string const& file,
                      scm::gl::sampler_state_desc const& state_descripton)
     : Texture(file, 0, state_descripton),
@@ -108,12 +82,6 @@ layers_(layers)
   
 }
 */
-void VTTexture2D::initialize(RenderContext *context){
-    std::cout << "yeah";
-
-    //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
-    //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE); 
-  }
 
   void VTTexture2D::initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const {
 
@@ -188,7 +156,6 @@ void VTTexture2D::initialize(RenderContext *context){
   }
 
   void VTTexture2D::initialize_physical_texture(RenderContext const& ctx) const{
-    std::cout << "phy tex wohoo";
     auto render_device = ctx.render_device;
     auto render_context = ctx.render_context;
 
@@ -206,8 +173,6 @@ void VTTexture2D::initialize(RenderContext *context){
 
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
-  std::cout << "hello from upload_to" << std::endl;
-
   {
     /*
     ctex.texture = context.render_device->create_texture_2d(
@@ -223,8 +188,6 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
 
 
   void VTTexture2D::update(RenderContext const& context) const {
-
-    std::cout << "Performing cut update for VT2D!\n";
 
     std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
 
@@ -242,10 +205,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
 
     scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
     scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1); 
-    update_sub_data(context, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&rand_buffer[0]) );
-
-    //delete cut_update;
-    
+    update_sub_data(context, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&rand_buffer[0]) );    
 
   };
 
