@@ -35,6 +35,7 @@
 #include <gua/renderer/ResourceFactory.hpp>
 
 
+
 #include <scm/core.h>
 
 
@@ -74,6 +75,7 @@ namespace gua {
     scm::shared_ptr<scm::core>                                                        _scm_core;
     scm::gl::sampler_state_ptr                                                        _filter_nearest;
     scm::gl::sampler_state_ptr                                                        _filter_linear;
+    //vt::CutUpdate                                                                     *_cut_update;
     //scm::math::vec2ui                                                                 _index_texture_dimension;
     //scm::gl::texture_2d_ptr                                                           _index_texture;
     //scm::gl::texture_2d_ptr                                                           _physical_texture;

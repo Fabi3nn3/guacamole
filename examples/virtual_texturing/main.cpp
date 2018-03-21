@@ -81,6 +81,10 @@ int main(int argc, char** argv) {
 
 
 
+
+
+    //cut_update->stop();
+
     std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
     std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
 
@@ -91,6 +95,19 @@ int main(int argc, char** argv) {
     std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
     vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
 
+    uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
+    uint16_t view_id = vt::CutDatabase::get_instance().register_view();
+    uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
+
+    uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
+
+
+
+    auto *cut_update = &vt::CutUpdate::get_instance();
+    cut_update->start();
+
+    auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
+    auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
 
 
 
@@ -178,6 +195,7 @@ int main(int argc, char** argv) {
 
 
 
+ //_cut_update->feedback(&feedback_buffer[0]);
 
   //setup rendering pipeline and window
   auto resolution = gua::math::vec2ui(1920, 1080);

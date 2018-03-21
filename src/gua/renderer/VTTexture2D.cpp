@@ -39,8 +39,10 @@
 #include <lamure/vt/VTConfig.h>
 #include <lamure/vt/ren/CutUpdate.h>
 #include <lamure/vt/ren/CutDatabase.h>
+#include <lamure/vt/QuadTree.h>
 
 #include <iostream>
+#include <condition_variable>
 
 namespace gua {
 /*
@@ -78,12 +80,12 @@ VTTexture2D::VTTexture2D(std::string const& file,
 
 
 
-    uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file);
-    uint16_t view_id = vt::CutDatabase::get_instance().register_view();
-    uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
+    //uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file);
+    //uint16_t view_id = vt::CutDatabase::get_instance().register_view();
+    //uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
 
 
-    std::cout << "Data, view & primary context id: " << data_id << ", " << view_id << ", " << primary_context_id << "\n";
+    //std::cout << "Data, view & primary context id: " << data_id << ", " << view_id << ", " << primary_context_id << "\n";
 //
 
 
@@ -124,7 +126,8 @@ void VTTexture2D::initialize(RenderContext *context){
 
 
     std::cout << "Before retrieving cut\n";
-    uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
+    uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
+    //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
     _index_texture_dimension = scm::math::vec2ui(size_index_texture, size_index_texture);
 
     RenderContext::Texture ctex;
@@ -149,8 +152,8 @@ void VTTexture2D::initialize(RenderContext *context){
 
         red_buffer[ pixel_offset + 0 ] = 0;
         red_buffer[ pixel_offset + 1 ] = 0;
-        red_buffer[ pixel_offset + 2 ] = 128;
-        red_buffer[ pixel_offset + 3 ] = 255;
+        red_buffer[ pixel_offset + 2 ] = 0;
+        red_buffer[ pixel_offset + 3 ] = 0;
 
       }
     }
@@ -192,11 +195,6 @@ void VTTexture2D::initialize(RenderContext *context){
     auto render_context = ctx.render_context;
 
 
-
-    auto *cut_update = new vt::CutUpdate();
-    cut_update->start();
-    cut_update->stop();
-
     _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
 
 
@@ -205,8 +203,6 @@ void VTTexture2D::initialize(RenderContext *context){
     ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 0, vt::VTConfig::get_instance().get_phys_tex_layers() + 1) ;
 
     std::cout << "done creating physical texture\n";
-
-    delete cut_update;
     
   }
 
@@ -222,7 +218,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
     initialize_index_texture(context, 0);
 
     if(!context.physical_texture) {
-      initialize_physical_texture(context);
+      //initialize_physical_texture(context);
     }
   }
 }
@@ -230,9 +226,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
 
   void VTTexture2D::update(RenderContext const& context) const {
 
-    //PUT INDEX TEXTURE CUT UPDATE HERE
     std::cout << "Performing cut update for VT2D!\n";
-
 
     std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
 
@@ -249,10 +243,15 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
     }
 
     scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
-    scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1);
+    scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1); 
     update_sub_data(context, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&rand_buffer[0]) );
 
+    //delete cut_update;
+    
+
   };
+
+
 
   //initialize(*context);
 /*

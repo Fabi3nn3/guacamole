@@ -23,6 +23,8 @@
 #include <gua/renderer/VirtualTexturingRenderer.hpp>
 #include <gua/renderer/VirtualTexturingPass.hpp>
 #include <gua/renderer/VTTexture2D.hpp>
+#include <lamure/vt/VTConfig.h>
+#include <lamure/vt/common.h>
 
 // guacamole headers
 #include <gua/renderer/Pipeline.hpp>
@@ -39,17 +41,14 @@
 
 #include <gua/config.hpp>
 #include <scm/gl_core/shader_objects.h>
+#include <scm/gl_core/render_device/context.h>
 
-#include <lamure/vt/ren/CutUpdate.h>
-#include <lamure/vt/ren/CutDatabase.h>
-#include <lamure/vt/common.h>
 // external headers
 #include <sstream>
 #include <fstream>
 #include <regex>
 #include <list>
 
-#include <lamure/vt/VTConfig.h>
 
 
 #include <lamure/ren/camera.h>
@@ -58,6 +57,10 @@
 #include <lamure/ren/model_database.h>
 #include <lamure/ren/cut_database.h>
 #include <lamure/ren/controller.h>
+
+
+#include <lamure/vt/ren/CutUpdate.h>
+#include <lamure/vt/ren/CutDatabase.h>
 
 
 #include <boost/assign/list_of.hpp>
@@ -86,20 +89,6 @@ namespace gua {
 */
   }
 
-  //BRAUCHEN WIR REGISTER CONTEXT IN CUTUPADTE???
-
-  /////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-  lamure::context_t PLodRenderer::_register_context_in_cut_update(gua::RenderContext const& ctx) {
-    lamure::ren::controller* controller = lamure::ren::controller::get_instance(); 
-    if (previous_frame_count_ != ctx.framecount) {
-      controller->reset_system();
-    }
-    return controller->deduce_context_id(ctx.id);
-  }
-*/
-
   void VirtualTexturingRenderer::init() {
     //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
     //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE);
@@ -119,59 +108,76 @@ namespace gua {
 
       for(vt::cut_map_entry_type cut_entry : (*cut_db->get_cut_map()))
       {
-        vt::Cut *cut = cut_db->start_reading_cut(cut_entry.first);
+        std::cout <<"Cut Entry.first:" << cut_entry.first << "\n";
 
-        if(!cut->is_drawn())
+        /*if(cut_entry.first == 0 ){*/
+
+          vt::Cut *cut = cut_db->start_reading_cut(cut_entry.first);
+
+          if(!cut->is_drawn())
+          {
+              std::cout<<"hello from !cut is_drawn\n";
+              cut_db->stop_reading_cut(cut_entry.first);
+              continue;
+          }
+          std::cout << "bevor updating\n";
+          update_index_texture(ctx, cut_id, vt::Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
+          std::cout << "nach updating\n";
+
+          /*for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
+          {
+            const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
+
+            if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
+            {
+                 if(mem_slot_updated == nullptr)
+                 {
+                     std::cerr << "Mem slot at " << position_slot_updated.second << " is null" << std::endl;
+                 }
+                 else
+                 {
+                     std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
+                     std::cerr << "Mem slot #" << mem_slot_updated->position << std::endl;
+                     std::cerr << "Tile id: " << mem_slot_updated->tile_id << std::endl;
+                     std::cerr << "Locked: " << mem_slot_updated->locked << std::endl;
+                     std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
+                     std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
+                 }
+                 throw std::runtime_error("updated mem slot inconsistency");
+            }
+            //TODO
+            //update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+
+          }*/
+          cut_db->stop_reading_cut(cut_entry.first);
+          
+        /*}*/ 
+       /* else
         {
             cut_db->stop_reading_cut(cut_entry.first);
-            continue;
-        }
-        //TODO
-        update_index_texture(ctx, cut_id, vt::Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
-        for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
-        {
-          const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
-
-          if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
-          {
-               if(mem_slot_updated == nullptr)
-               {
-                   std::cerr << "Mem slot at " << position_slot_updated.second << " is null" << std::endl;
-               }
-               else
-               {
-                   std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
-                   std::cerr << "Mem slot #" << mem_slot_updated->position << std::endl;
-                   std::cerr << "Tile id: " << mem_slot_updated->tile_id << std::endl;
-                   std::cerr << "Locked: " << mem_slot_updated->locked << std::endl;
-                   std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
-                   std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
-               }
-               throw std::runtime_error("updated mem slot inconsistency");
-          }
-          //TODO
-          update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
-
-        }
-        cut_db->stop_reading_cut(cut_entry.first);
-        
+        }*/
       }
-      cut_db->stop_reading();
-      //TODO
-      //render_context->scm::gl::sync();
+        cut_db->stop_reading();
+        render_context->sync();
   }
 
   void VirtualTexturingRenderer::update_index_texture(gua::RenderContext const& ctx,uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu) {
-/*
-    VTTexture2D _index_texture;
+
+    auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
+
+    for( auto const& vt_ptr : vector_of_vt_ptr ) {
     
-    scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
-    //scm::math::vec3ui dimensions = scm::math::vec3ui(_dataset_resources[dataset_id]->_index_texture_dimension, 1);
-    //TODO: schlauer machen !!
-    uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
-    scm::math::vec2ui _index_texture_dimension = scm::math::vec2ui(size_index_texture, size_index_texture);
-    _index_texture.update_sub_data(ctx, scm::gl::texture_region(origin, _index_texture_dimension), 0, scm::gl::FORMAT_RGBA_8UI, buf_cpu);
-*/
+
+      //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
+      uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
+      std::cout << "Size IndexTexture: " << size_index_texture << "\n";
+      
+      scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
+      scm::math::vec3ui _index_texture_dimension = scm::math::vec3ui(size_index_texture, size_index_texture, 1);
+
+      vt_ptr->update_sub_data(ctx, scm::gl::texture_region(origin, _index_texture_dimension), 0, scm::gl::FORMAT_RGBA_8UI, buf_cpu);
+    }
+
   }
 
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
@@ -192,16 +198,6 @@ namespace gua {
 */
   }
 
-  //bin mir nicht sicher ob wir das benötigen
-  /*
-  lamure::context_t VirtualTexturingRenderer::register_context_in_cut_update(gua::RenderContext const& ctx) {
-    lamure::ren::controller* controller = lamure::ren::controller::get_instance(); 
-    if (previous_frame_count_ != ctx.framecount) {
-      controller->reset_system();
-    }
-    return controller->deduce_context_id(ctx.id);
-  }*/
-
 
   ///////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::render(gua::Pipeline& pipe, PipelinePassDescription const& desc) {
@@ -212,7 +208,7 @@ namespace gua {
     auto scm_context = ctx.render_context;
     //per frame
     //_create_gpu_resources(ctx,cut_id);
-
+    //_cut_update = &(new vt::CutUpdate());
     ///////////////////////////////////////////////////////////////////////////
     //  retrieve current view state
     ///////////////////////////////////////////////////////////////////////////
@@ -224,18 +220,18 @@ namespace gua {
     std::string cpu_query_name_plod_total = "CPU: Camera uuid: " + std::to_string(pipe.current_viewstate().viewpoint_uuid) + " / LodPass";
     pipe.begin_cpu_query(cpu_query_name_plod_total);
     
+    //apply cutUpdate with dummy ids = all zero
+    apply_cut_update(ctx,0,0);
 
+    auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
+    auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
+    std::vector<uint32_t> feedback_buffer(phys_width * phys_width * phys_layers, UINT32_MAX);
 
+    std::cout << "fbbuffer address: "<< &feedback_buffer[0] << "& inhalt: " << feedback_buffer[1];
+    vt::CutUpdate::get_instance().feedback(&feedback_buffer[0]);
 
 
     //retrieve virtual textures to update them
-    auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
-
-    for( auto const& vt_ptr : vector_of_vt_ptr ) {
-      vt_ptr->update(ctx);
-    }
-
-
 
 
     // if(lamure_cut_update is not running -> run)
@@ -252,17 +248,6 @@ namespace gua {
     // with lamure: stop reading cut
 
     // if you did not update the GPU textures before: update them now with the copied CPU representation
-
-
-    //BRAUCHEN WIR DAS ?!
-    /*
-    //create lamure camera out of gua camera values
-    lamure::ren::controller* controller = lamure::ren::controller::get_instance();
-    lamure::ren::cut_database* cuts = lamure::ren::cut_database::get_instance();
-    lamure::ren::model_database* database = lamure::ren::model_database::get_instance();
-    */
-
-
 
 
     //std::cout << "Render Frame in VT-Renderer\n";

@@ -62,11 +62,17 @@ GBuffer::GBuffer(RenderContext const& ctx, math::vec2ui const& resolution):
   depth_buffer_       = ctx.render_device->create_texture_2d(resolution, scm::gl::FORMAT_D24_S8,  1);
   ctx.render_context->make_resident(depth_buffer_, sampler_state_);
 
+  //G-Buffer Attachment RGBA8UI
+
+  vt_buffer = ctx.render_device->create_texture_2d(resolution, scm::gl::FORMAT_RGBA_8UI, 1);
+  ctx.render_context->make_resident(vt_buffer, sampler_state_);
+
   fbo_read_ = ctx.render_device->create_frame_buffer();
   fbo_read_->attach_color_buffer(0, color_buffer_read_,0,0);
   fbo_read_->attach_color_buffer(1, pbr_buffer_, 0, 0);
   fbo_read_->attach_color_buffer(2, normal_buffer_,0,0);
   fbo_read_->attach_color_buffer(3, flags_buffer_,0,0);
+  fbo_read_->attach_color_buffer(4, vt_buffer,0,0);
   fbo_read_->attach_depth_stencil_buffer(depth_buffer_,0,0);
 
   fbo_write_ = ctx.render_device->create_frame_buffer();
@@ -74,6 +80,7 @@ GBuffer::GBuffer(RenderContext const& ctx, math::vec2ui const& resolution):
   fbo_write_->attach_color_buffer(1, pbr_buffer_,0,0);
   fbo_write_->attach_color_buffer(2, normal_buffer_,0,0);
   fbo_write_->attach_color_buffer(3, flags_buffer_,0,0);
+  fbo_write_->attach_color_buffer(4, vt_buffer,0,0);
   fbo_write_->attach_depth_stencil_buffer(depth_buffer_,0,0);
 
   fbo_read_only_color_ = ctx.render_device->create_frame_buffer();
@@ -167,6 +174,9 @@ void GBuffer::remove_buffers(RenderContext const& ctx) {
   }
   if (depth_buffer_) {
     ctx.render_context->make_non_resident(depth_buffer_);
+  }
+  if(vt_buffer) {
+    ctx.render_context->make_non_resident(vt_buffer);
   }
 }
 
