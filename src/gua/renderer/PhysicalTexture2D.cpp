@@ -63,26 +63,23 @@ PhysicalTexture2D::PhysicalTexture2D(std::string const& file,
 
 
     std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
-    ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 1, vt::VTConfig::get_instance().get_phys_tex_layers() + 1) ;
+    /*
+        texture_2d_ptr                  create_texture_2d(const math::vec2ui& in_size,
+                                                      const data_format   in_format,
+                                                      const unsigned      in_mip_levels = 1,
+                                                      const unsigned      in_array_layers = 1,
+const unsigned in_samples = 1);
+    */
+    ctx.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, scm::gl::FORMAT_RGBA_8UI, 1, vt::VTConfig::get_instance().get_phys_tex_layers()) ;
 
     std::cout << "done creating physical texture\n";
     
   }
 
 void PhysicalTexture2D::upload_to(RenderContext const& context) const {
-  RenderContext::Texture ctex{};
-  std::cout << "hello from upload_to" << std::endl;
-
-  {
-    /*
-    ctex.texture = context.render_device->create_texture_2d(
-        math::vec2ui(width_, height_), color_format_, 1);
-    */
-    //initialize_index_texture(context, 0);
-
-    if(!context.physical_texture) {
-      //initialize_physical_texture(context);
-    }
+  if(!context.physical_texture)
+  { 
+    initialize_physical_texture(context); 
   }
 }
 

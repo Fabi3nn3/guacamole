@@ -103,7 +103,7 @@ namespace gua {
           }
           update_index_texture(ctx, cut_id, vt::Cut::get_dataset_id(cut_entry.first), ctx_id, cut->get_front()->get_index());
 
-          /*for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
+          for(auto position_slot_updated : cut->get_front()->get_mem_slots_updated())
           {
             const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
 
@@ -125,9 +125,9 @@ namespace gua {
                  throw std::runtime_error("updated mem slot inconsistency");
             }
             //TODO
-            //update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+            update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
 
-          }*/
+          }
           cut_db->stop_reading_cut(cut_entry.first);
           
         }
@@ -161,10 +161,13 @@ namespace gua {
   }
 
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
-
-    /*
-    VTTexture2D _physical_texture;
     
+    auto phy_tex = TextureDatabase::instance()->lookup("gua_physical_texture_2d");
+
+    if(phy_tex == nullptr) {
+      std::cout << "physical_context is nullptr\n";
+    } else {
+
     size_t slots_per_texture = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width();
     size_t layer = slot_position / slots_per_texture;
     size_t rel_slot_position = slot_position - layer * slots_per_texture;
@@ -174,8 +177,9 @@ namespace gua {
     scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
     scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
 
-    _physical_texture.update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
-*/
+    phy_tex->update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
+    }
+
   }
 
 

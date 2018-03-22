@@ -82,6 +82,7 @@ void Texture::update_sub_data(RenderContext const& context,
       region, level, format, data);
 }
 
+
 void Texture::generate_mipmaps(RenderContext const& context) {
   auto iter = context.textures.find(uuid_);
   if (iter == context.textures.end()) {
