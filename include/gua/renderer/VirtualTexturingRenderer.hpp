@@ -50,7 +50,6 @@ namespace gua {
   public:
 
     VirtualTexturingRenderer();
-    /*void start_cut_update(gua::RenderContext const& ctx);*/
     void render(Pipeline& pipe, PipelinePassDescription const& desc);
     void set_global_substitution_map(SubstitutionMap const& smap);
     void apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id);
@@ -74,6 +73,7 @@ namespace gua {
     scm::shared_ptr<scm::core>                                                        _scm_core;
     scm::gl::sampler_state_ptr                                                        _filter_nearest;
     scm::gl::sampler_state_ptr                                                        _filter_linear;
+    bool                                                                              _cut_update_started;
     //vt::CutUpdate                                                                     *_cut_update;
     //scm::math::vec2ui                                                                 _index_texture_dimension;
     //scm::gl::texture_2d_ptr                                                           _index_texture;

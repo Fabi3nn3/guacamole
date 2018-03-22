@@ -50,104 +50,12 @@ PhysicalTexture2D::PhysicalTexture2D(std::string const& file,
                      scm::gl::sampler_state_desc const& state_descripton)
     : Texture(file, 0, state_descripton),
       width_(0),
-      height_(0) {
-
-
-
-    //uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file);
-    //uint16_t view_id = vt::CutDatabase::get_instance().register_view();
-    //uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
-
-
-    //std::cout << "Data, view & primary context id: " << data_id << ", " << view_id << ", " << primary_context_id << "\n";
-//
-
-
-}
-
-void PhysicalTexture2D::initialize(RenderContext *context){
-    std::cout << "yeah";
-
-    //_filter_nearest = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
-    //_filter_linear = render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE); 
-  }
-
-  void PhysicalTexture2D::initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const {
-
-    auto render_device = ctx.render_device;
-    auto render_context = ctx.render_context;
-
-
-
-
-    std::cout << "Before retrieving cut\n";
-    uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
-    //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
-    _index_texture_dimension = scm::math::vec2ui(size_index_texture, size_index_texture);
-
-    RenderContext::Texture ctex;
-
-    std::cout << "Create Texture 2D\n";
-
-    ctex.texture = ctx.render_device->create_texture_2d(_index_texture_dimension, scm::gl::FORMAT_RGBA_8UI);
-
-    std::cout << "Index texture dimensions: " << _index_texture_dimension[0] << ", " << _index_texture_dimension[1] << "\n";
-
-
-
-    scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
-    scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1);
-
-
-    std::vector<unsigned char> red_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
-
-    for(unsigned int y_idx = 0; y_idx < _index_texture_dimension[1]; ++y_idx) {
-      for(unsigned int x_idx = 0; x_idx < _index_texture_dimension[0]; ++x_idx) {
-        unsigned int pixel_offset = ( y_idx * _index_texture_dimension[0] + x_idx ) * 4;
-
-        red_buffer[ pixel_offset + 0 ] = 0;
-        red_buffer[ pixel_offset + 1 ] = 0;
-        red_buffer[ pixel_offset + 2 ] = 0;
-        red_buffer[ pixel_offset + 3 ] = 0;
-
-      }
-    }
-
-
-
-
-
-    if (ctex.texture) {
-      auto filter_nearest_descriptor = scm::gl::sampler_state_desc(scm::gl::FILTER_MIN_MAG_NEAREST,
-                                                                   scm::gl::WRAP_REPEAT,
-                                                                   scm::gl::WRAP_REPEAT);
-
-      ctex.sampler_state = ctx.render_device->create_sampler_state(state_descripton_);
-
-      ctx.textures[uuid_] = ctex;
-      ctx.render_context->make_resident(ctex.texture, ctex.sampler_state);
-
-      update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&red_buffer[0]) );
-    } else {
-      std::cout << "FAILED TO CREATE INDEX TEXTURE\n";
-    }
-
-/*
-    if (ctex.texture) {
-      ctex.sampler_state =
-          context.render_device->create_sampler_state(state_descripton_);
-
-      context.textures[uuid_] = ctex;
-      context.render_context->make_resident(ctex.texture, ctex.sampler_state);
-
-    ctx.textures.insert(uuid(), Texture( render_device->create_texture_2d(_index_texture_dimension, scm::gl::FORMAT_RGBA_8UI) ) );// _index_texture = render_device->create_texture_2d(_index_texture_dimension, scm::gl::FORMAT_RGBA_8UI);
-*/
-  }
+      height_(0) {}  
 
   void PhysicalTexture2D::initialize_physical_texture(RenderContext const& ctx) const{
     std::cout << "phy tex wohoo";
     auto render_device = ctx.render_device;
-    auto render_context = ctx.render_context;
+    //auto render_context = ctx.render_context;
 
 
     _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
@@ -170,7 +78,7 @@ void PhysicalTexture2D::upload_to(RenderContext const& context) const {
     ctex.texture = context.render_device->create_texture_2d(
         math::vec2ui(width_, height_), color_format_, 1);
     */
-    initialize_index_texture(context, 0);
+    //initialize_index_texture(context, 0);
 
     if(!context.physical_texture) {
       //initialize_physical_texture(context);
@@ -183,7 +91,7 @@ void PhysicalTexture2D::upload_to(RenderContext const& context) const {
 
     std::cout << "Performing cut update for VT2D!\n";
 
-    std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
+    /*std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
 
     for(unsigned int y_idx = 0; y_idx < _index_texture_dimension[1]; ++y_idx) {
       for(unsigned int x_idx = 0; x_idx < _index_texture_dimension[0]; ++x_idx) {
@@ -203,7 +111,7 @@ void PhysicalTexture2D::upload_to(RenderContext const& context) const {
 
     //delete cut_update;
     
-
+*/
   };
 
 

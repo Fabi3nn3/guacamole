@@ -84,7 +84,7 @@ layers_(layers)
 */
 
   void VTTexture2D::initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const {
-
+    
     auto render_device = ctx.render_device;
     auto render_context = ctx.render_context;
 
@@ -128,6 +128,7 @@ layers_(layers)
 
 
 
+
     if (ctex.texture) {
       auto filter_nearest_descriptor = scm::gl::sampler_state_desc(scm::gl::FILTER_MIN_MAG_NEAREST,
                                                                    scm::gl::WRAP_REPEAT,
@@ -142,7 +143,6 @@ layers_(layers)
     } else {
       std::cout << "FAILED TO CREATE INDEX TEXTURE\n";
     }
-
 /*
     if (ctex.texture) {
       ctex.sampler_state =
@@ -159,10 +159,10 @@ layers_(layers)
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
   {
-    /*
+    
     ctex.texture = context.render_device->create_texture_2d(
         math::vec2ui(width_, height_), color_format_, 1);
-    */
+    
     initialize_index_texture(context, 0);
 
     if(!context.physical_texture) {
@@ -173,7 +173,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
 
 
   void VTTexture2D::update(RenderContext const& context) const {
-
+/*
     std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
 
     for(unsigned int y_idx = 0; y_idx < _index_texture_dimension[1]; ++y_idx) {
@@ -191,7 +191,7 @@ void VTTexture2D::upload_to(RenderContext const& context) const {
     scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
     scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1); 
     update_sub_data(context, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&rand_buffer[0]) );    
-
+*/
   };
 
 

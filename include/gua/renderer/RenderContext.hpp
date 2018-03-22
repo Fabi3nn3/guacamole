@@ -65,7 +65,6 @@ struct GUA_DLL RenderContext {
   * c'tor
   */
   RenderContext();
-  void set_cut_update_started();
 
   /**
    * The schism render device associated with this context.

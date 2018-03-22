@@ -68,7 +68,7 @@ class GUA_DLL VTTexture2D : public Texture {
 
  private:
   std::string _file_config;
-  std::string _file_atlas;
+  std::string _file_atlas;  
   scm::shared_ptr<scm::gl::render_device> _device;
   mutable scm::math::vec2ui                                                         _index_texture_dimension;
   mutable scm::math::vec2ui                                                         _physical_texture_dimension;

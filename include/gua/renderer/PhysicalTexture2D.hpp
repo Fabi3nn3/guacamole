@@ -81,8 +81,6 @@ class GUA_DLL PhysicalTexture2D : public Texture {
   unsigned height() const override { return height_; }
 
   void upload_to(RenderContext const& context) const override;
-  void initialize(RenderContext *context);
-  void initialize_index_texture(RenderContext const& ctx, uint64_t cut_id) const;
   void initialize_physical_texture(RenderContext const& ctx) const;
 
   void update(RenderContext const& context) const override;

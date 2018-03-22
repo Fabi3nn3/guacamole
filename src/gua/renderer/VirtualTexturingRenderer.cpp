@@ -70,35 +70,20 @@ namespace gua {
 
 
   //////////////////////////////////////////////////////////////////////////////
-  VirtualTexturingRenderer::VirtualTexturingRenderer(){}
+  VirtualTexturingRenderer::VirtualTexturingRenderer()
+  {
+    auto *cutupdate = &vt::CutUpdate::get_instance();
+    cutupdate->start();
+    _cut_update_started = true;
+  }
 
   ///////////////////////////////////////////////////////////////////////////////
   void VirtualTexturingRenderer::_create_gpu_resources(gua::RenderContext const& ctx, uint64_t cut_id/*,
-                                           scm::math::vec2ui const& render_target_dims*/) {
-    //invalidation before first write
-    /*gua::VTTexture2D vttex;
-    previous_frame_count_ = UINT_MAX;
-    vttex.initialize_index_texture(ctx, cut_id);
-    vttex.initialize_physical_texture(ctx);
+                                           scm::math::vec2ui const& render_target_dims*/) {}
 
-    //not quite sure ob das so funktioniert bzw die stelle richtig ist
-    _filter_nearest = ctx.render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_NEAREST, scm::gl::WRAP_CLAMP_TO_EDGE);
-    _filter_linear = ctx.render_device->create_sampler_state(scm::gl::FILTER_MIN_MAG_LINEAR, scm::gl::WRAP_CLAMP_TO_EDGE);
-*/
-  }
 
- /*void VirtualTexturingRenderer::start_cut_update(gua::RenderContext const& ctx)
- {
-    auto *cut_update = &vt::CutUpdate::get_instance();
-    cut_update->start();
-    ctx.set_cut_update_started();
-
- }*/
   /////////////////////////////////////////////////////////////////////////////////////////////
-  void VirtualTexturingRenderer::set_global_substitution_map(SubstitutionMap const& smap) {
-
-  }
-
+  void VirtualTexturingRenderer::set_global_substitution_map(SubstitutionMap const& smap) {}
   
   void VirtualTexturingRenderer::apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id){
       auto render_context = ctx.render_context;

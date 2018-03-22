@@ -38,8 +38,5 @@ namespace gua {
     framecount(0)
     {}
 
-  void RenderContext::set_cut_update_started(){
-        cut_update_started = true;
-    }
 
 }
