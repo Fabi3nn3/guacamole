@@ -84,7 +84,7 @@ class GUA_DLL PhysicalTexture2D : public Texture {
   void initialize_physical_texture(RenderContext const& ctx) const;
 
   void update(RenderContext const& context) const override;
-
+  static scm::gl::data_format get_tex_format();
   ///@}
 
  protected:

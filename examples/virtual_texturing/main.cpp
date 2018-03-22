@@ -75,16 +75,11 @@ int main(int argc, char** argv) {
 
   gua::TriMeshLoader loader;
 
-  //teapot_mat->set_uniform("ColorMap", std::string());
+  std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
+  std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
 
-    std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
-    std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
-
-
-    vt::VTConfig::CONFIG_PATH = file_config;
-
-
-    std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
+  vt::VTConfig::CONFIG_PATH = file_config;
+  std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
 
   //GPU Infos wrong - why? 
    GLint max_tex_layers;
@@ -93,81 +88,43 @@ int main(int argc, char** argv) {
    GLint max_tex_px_width_gl;
    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
 
-   std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
+  std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
 
 
-    vt::VTConfig::get_instance().define_size_physical_texture(16, 256000);
+  vt::VTConfig::get_instance().define_size_physical_texture(8, 2048);
 
-    uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
-    uint16_t view_id = vt::CutDatabase::get_instance().register_view();
-    uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
+  uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
+  uint16_t view_id = vt::CutDatabase::get_instance().register_view();
+  uint16_t primary_context_id = vt::CutDatabase::get_instance().register_context();
 
-    uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
-
-
+  uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
 //    auto *cut_update = &vt::CutUpdate::get_instance();
 //    cut_update->start();
 
-
     auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
     auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
 
-
-
     auto vt_material(load_mat("data/materials/VirtualTexturing.gmd"));
 
-    std::string const vt_path = "data/textures/envmap.jpg";
-    gua::TextureDatabase::instance()->load(file_atlas);
-
+    //happens in set_uniform too :)
+    //gua::TextureDatabase::instance()->load(file_atlas);
 
     vt_material->set_uniform("ColorMap", std::string(file_atlas));
-
+    std::string phy_tex_name = "gua_physical_texture_2d";
+    vt_material->set_uniform("PhysicalTexture2D", std::string(phy_tex_name));
 
 
     auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
-    auto teapot(loader.create_geometry_from_file(
-        "teapot", "data/objects/teapot.obj",
+    auto box(loader.create_geometry_from_file(
+        "box", "data/objects/teapot.obj",
         vt_material,
         gua::TriMeshLoader::NORMALIZE_POSITION |
         gua::TriMeshLoader::NORMALIZE_SCALE) );
 
-    graph.add_node("/transform", teapot);
-
-
-    //gua::TextureDatabase::instance()->load(file_atlas);
+    graph.add_node("/transform", box);
 
     
-
-/*
-    //calls read_config when creating instance
-
-
- 
-    std::cout << "Defined Physical Texture with: " << max_tex_layers << " Layers and " << max_tex_px_width_gl<< " max_px_width_gl" << std::endl;
-
-    vt::VTConfig::get_instance().define_size_physical_texture((int32_t) max_tex_layers,(int32_t) max_tex_px_width_gl);
-
-
-
-    uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
-
-    auto *cut_update = new vt::CutUpdate();
-    cut_update->start();
-
-    uint32_t phy_tex_dim_width = vt::VTConfig::get_instance().get_phys_tex_px_width();
-    std::cout << "Phy Tex Dim: "<< phy_tex_dim_width << std::endl;
-    //create phy tex -> .atlas possible
-
-
-    //own function
-    vt::VTConfig::FORMAT_TEXTURE phy_tex_format = vt::VTConfig::get_instance().get_format_texture();
-    uint32_t physical_texture_width = vt::VTConfig::get_instance().get_phys_tex_px_width();
-    uint16_t physical_texture_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
-    gua::math::vec2ui physical_texture_dim = gua::math::vec2ui(physical_texture_width);
-    std::cout <<"phy tex dim: "<< physical_texture_dim << endl;
-
-    */
     //gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
 
     

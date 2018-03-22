@@ -107,7 +107,7 @@ namespace gua {
           {
             const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
 
-            if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
+            /*if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
             {
                  if(mem_slot_updated == nullptr)
                  {
@@ -123,7 +123,7 @@ namespace gua {
                      std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
                  }
                  throw std::runtime_error("updated mem slot inconsistency");
-            }
+            }*/
             //TODO
             update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
 
@@ -141,14 +141,13 @@ namespace gua {
   }
 
   void VirtualTexturingRenderer::update_index_texture(gua::RenderContext const& ctx,uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu) {
-
+    //std::cout << "hello :)";
     auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
-
+    auto phy_tex = TextureDatabase::instance()->lookup("gua_physical_texture_2d");
     //ctx.physical_texture
 
     for( auto const& vt_ptr : vector_of_vt_ptr ) {
-    
-
+      if(vt_ptr != phy_tex){
       //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
       uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
       
@@ -156,28 +155,43 @@ namespace gua {
       scm::math::vec3ui _index_texture_dimension = scm::math::vec3ui(size_index_texture, size_index_texture, 1);
 
       vt_ptr->update_sub_data(ctx, scm::gl::texture_region(origin, _index_texture_dimension), 0, scm::gl::FORMAT_RGBA_8UI, buf_cpu);
+      }
+      else
+      {
+        std::cout << "Phy tex exists";
+      }
     }
 
   }
 
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
-    
+    auto phy_tex_ptr = ctx.physical_texture;
+    auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
     auto phy_tex = TextureDatabase::instance()->lookup("gua_physical_texture_2d");
 
-    if(phy_tex == nullptr) {
-      std::cout << "physical_context is nullptr\n";
-    } else {
+    if(phy_tex_ptr == nullptr) {
+      //std::cout << "physical_context is nullptr\n";
+    } 
+    else 
+    {
+      size_t slots_per_texture = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width();
+      size_t layer = slot_position / slots_per_texture;
+      size_t rel_slot_position = slot_position - layer * slots_per_texture;
+      size_t x_tile = rel_slot_position % vt::VTConfig::get_instance().get_phys_tex_tile_width();
+      size_t y_tile = rel_slot_position / vt::VTConfig::get_instance().get_phys_tex_tile_width();
 
-    size_t slots_per_texture = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width();
-    size_t layer = slot_position / slots_per_texture;
-    size_t rel_slot_position = slot_position - layer * slots_per_texture;
-    size_t x_tile = rel_slot_position % vt::VTConfig::get_instance().get_phys_tex_tile_width();
-    size_t y_tile = rel_slot_position / vt::VTConfig::get_instance().get_phys_tex_tile_width();
+      scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
+      scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
 
-    scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
-    scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
+      for( auto const& vt_ptr : vector_of_vt_ptr )
+      {
+        if(vt_ptr == phy_tex)
+        {
+          std::cout << "yeah!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+        vt_ptr->update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
+        }
+      }
 
-    phy_tex->update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
     }
 
   }

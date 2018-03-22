@@ -10,11 +10,13 @@
         // color generation ----------------------------------------------------
         void FragmentColor() {
 
-          vec4 color = texture(usampler2D(ColorMap), gua_texcoords);
+          vec4 idx = texture(usampler2D(ColorMap), gua_texcoords);
+          //vec3 gua_vec3_texcoords = vec3(gua_texcoords, idx.w);
+          //vec4 color = texture(sampler2DArray(PhysicalTexture2D), gua_vec3_texcoords);
 
           gua_alpha = 1.0;
 
-          gua_color = color.rgb / 30.0;
+          gua_color = idx.rgb / 30.0;
           gua_metalness = 0.0;
           gua_emissivity = 1.0;
 
