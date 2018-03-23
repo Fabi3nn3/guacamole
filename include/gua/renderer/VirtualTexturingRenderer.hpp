@@ -55,6 +55,7 @@ namespace gua {
     void apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id);
     void update_index_texture(gua::RenderContext const& ctx, uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu);
     void update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position);
+    void collect_feedback(gua::RenderContext const& ctx, uint16_t context_id);
 
   private:  //shader related auxiliary methods
     //not sure about this one
@@ -74,6 +75,9 @@ namespace gua {
     scm::gl::sampler_state_ptr                                                        _filter_nearest;
     scm::gl::sampler_state_ptr                                                        _filter_linear;
     bool                                                                              _cut_update_started;
+    size_t                                                                            _size_feedback;
+    scm::gl::buffer_ptr                                                               _feedback_storage;
+    uint32_t                                                                         *_feedback_cpu_buffer;
     //vt::CutUpdate                                                                     *_cut_update;
     //scm::math::vec2ui                                                                 _index_texture_dimension;
     //scm::gl::texture_2d_ptr                                                           _index_texture;

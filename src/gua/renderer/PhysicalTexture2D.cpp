@@ -56,7 +56,7 @@ PhysicalTexture2D::PhysicalTexture2D(std::string const& file,
     std::cout << "phy tex wohoo!!!!!";
     RenderContext::Texture ctex;
     
-    _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width() * 2,  vt::VTConfig::get_instance().get_phys_tex_px_width() * 2);
+    _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
     std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
 
     //ctex.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 1, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
