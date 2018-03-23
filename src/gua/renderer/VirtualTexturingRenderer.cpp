@@ -72,9 +72,7 @@ namespace gua {
   //////////////////////////////////////////////////////////////////////////////
   VirtualTexturingRenderer::VirtualTexturingRenderer()
   {
-    auto *cutupdate = &vt::CutUpdate::get_instance();
-    cutupdate->start();
-    _cut_update_started = true;
+
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -107,7 +105,7 @@ namespace gua {
           {
             const vt::mem_slot_type *mem_slot_updated = &cut_db->get_front()->at(position_slot_updated.second);
 
-            /*if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
+            if(mem_slot_updated == nullptr || !mem_slot_updated->updated || !mem_slot_updated->locked || mem_slot_updated->pointer == nullptr)
             {
                  if(mem_slot_updated == nullptr)
                  {
@@ -122,10 +120,10 @@ namespace gua {
                      std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
                      std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
                  }
-                 throw std::runtime_error("updated mem slot inconsistency");
-            }*/
-            //TODO
-            update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+                 //throw std::runtime_error("updated mem slot inconsistency");
+            } else {
+              update_physical_texture_blockwise(ctx, ctx_id, mem_slot_updated->pointer, mem_slot_updated->position);
+            }
 
           }
           cut_db->stop_reading_cut(cut_entry.first);
@@ -167,7 +165,6 @@ namespace gua {
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
     auto phy_tex_ptr = ctx.physical_texture;
     auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
-    auto phy_tex = TextureDatabase::instance()->lookup("gua_physical_texture_2d");
 
     if(phy_tex_ptr == nullptr) {
       //std::cout << "physical_context is nullptr\n";
@@ -183,14 +180,17 @@ namespace gua {
       scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
       scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
 
-      for( auto const& vt_ptr : vector_of_vt_ptr )
-      {
-        if(vt_ptr == phy_tex)
-        {
-          std::cout << "yeah!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
-        vt_ptr->update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, buf_texel);
-        }
-      }
+
+      std::cout << "yeah!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+
+      std::cout << "origin: " << origin << ", " <<"dimensions: " << dimensions << "\n";
+
+      ctx.render_context->update_sub_texture(phy_tex_ptr, scm::gl::texture_region(origin, dimensions), 0, PhysicalTexture2D::get_tex_format(), buf_texel);
+      //phy_tex_ptr->update_sub_texture(ctx, scm::gl::texture_region(origin, dimensions), 0, PhysicalTexture2D::get_tex_format(), buf_texel);
+      std::cout << "Done updating the physical texture\n";
+      //update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&red_buffer[0]) );
+
+
 
     }
 

@@ -55,17 +55,12 @@ PhysicalTexture2D::PhysicalTexture2D(std::string const& file,
   void PhysicalTexture2D::initialize_physical_texture(RenderContext const& ctx) const{
     std::cout << "phy tex wohoo!!!!!";
     RenderContext::Texture ctex;
-    _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
+    
+    _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width() * 2,  vt::VTConfig::get_instance().get_phys_tex_px_width() * 2);
     std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
-    /*
-        texture_2d_ptr                  create_texture_2d(const math::vec2ui& in_size,
-                                                      const data_format   in_format,
-                                                      const unsigned      in_mip_levels = 1,
-                                                      const unsigned      in_array_layers = 1,
-const unsigned in_samples = 1);
-    */
-    //ctex.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 0, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
-    ctex.texture = ctx.render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 0, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
+
+    //ctex.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 1, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
+    ctex.texture = ctx.render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 1, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
     std::cout << "done creating physical texture\n";
 
     if (ctex.texture)
@@ -77,6 +72,7 @@ const unsigned in_samples = 1);
       ctex.sampler_state = ctx.render_device->create_sampler_state(state_descripton_);
 
       ctx.textures[uuid_] = ctex;
+      ctx.physical_texture = ctex.texture;
 
       ctx.render_context->make_resident(ctex.texture, ctex.sampler_state);
     } 
@@ -103,8 +99,8 @@ scm::gl::data_format PhysicalTexture2D::get_tex_format()
     case vt::VTConfig::RGB8:                                 
         return scm::gl::FORMAT_RGB_8;                    
     case vt::VTConfig::RGBA8:                                
-    default:                                             
-        return scm::gl::FORMAT_RGBA_8;                   
+    default:
+      return scm::gl::FORMAT_RGBA_8;                   
     }                                                    
 }                                                        
 

@@ -82,16 +82,16 @@ int main(int argc, char** argv) {
   std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
 
   //GPU Infos wrong - why? 
-   GLint max_tex_layers;
-   glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
+   //GLint max_tex_layers;
+   //glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
 
-   GLint max_tex_px_width_gl;
-   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
+   //GLint max_tex_px_width_gl;
+   //glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
 
-  std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
+  //std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
 
 
-  vt::VTConfig::get_instance().define_size_physical_texture(8, 2048);
+  vt::VTConfig::get_instance().define_size_physical_texture(50, 4096);
 
   uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
   uint16_t view_id = vt::CutDatabase::get_instance().register_view();
@@ -117,14 +117,14 @@ int main(int argc, char** argv) {
 
     auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
     auto box(loader.create_geometry_from_file(
-        "box", "data/objects/teapot.obj",
+        "box", "data/objects/box.obj",
         vt_material,
         gua::TriMeshLoader::NORMALIZE_POSITION |
         gua::TriMeshLoader::NORMALIZE_SCALE) );
 
     graph.add_node("/transform", box);
 
-    
+    box->scale(2.5);
     //gua::VTTexture2D physical_texture(physical_texture_dim,physical_texture_layers,phy_tex_format);
 
     
@@ -201,6 +201,11 @@ int main(int argc, char** argv) {
 
 
   window->open();
+
+
+    auto *cutupdate = &vt::CutUpdate::get_instance();
+    cutupdate->start();
+    //_cut_update_started = true;
 
   gua::Renderer renderer;
 

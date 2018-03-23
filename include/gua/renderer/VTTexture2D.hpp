@@ -71,7 +71,6 @@ class GUA_DLL VTTexture2D : public Texture {
   std::string _file_atlas;  
   scm::shared_ptr<scm::gl::render_device> _device;
   mutable scm::math::vec2ui                                                         _index_texture_dimension;
-  mutable scm::math::vec2ui                                                         _physical_texture_dimension;
   scm::gl::sampler_state_ptr                                                        _filter_nearest;
   scm::gl::sampler_state_ptr                                                        _filter_linear;
 };  

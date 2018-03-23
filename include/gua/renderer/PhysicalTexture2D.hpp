@@ -97,11 +97,6 @@ class GUA_DLL PhysicalTexture2D : public Texture {
   std::string _file_config;
   std::string _file_atlas;
   scm::shared_ptr<scm::gl::render_device> _device;
-  //scm::gl::render_device_ptr                                                        _scm_device;
-  //scm::gl::render_context_ptr                                                       _scm_context;
-  mutable scm::math::vec2ui                                                         _index_texture_dimension;
-  //mutable scm::gl::texture_2d_ptr                                                   _index_texture;
-  //mutable scm::gl::texture_2d_ptr                                                   _physical_texture;
   mutable scm::math::vec2ui                                                         _physical_texture_dimension;
   scm::gl::sampler_state_ptr                                                        _filter_nearest;
   scm::gl::sampler_state_ptr                                                        _filter_linear;

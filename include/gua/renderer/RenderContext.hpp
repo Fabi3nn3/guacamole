@@ -176,7 +176,9 @@ struct GUA_DLL RenderContext {
   */
   mutable std::unordered_map<std::size_t, Texture> textures;
 
-  mutable scm::gl::texture_2d_ptr physical_texture = nullptr;
+
+  mutable scm::gl::texture_image_ptr physical_texture = nullptr;
+
   /**
   * Texture arrays associated with this contect
   */

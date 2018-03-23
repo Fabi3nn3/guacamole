@@ -159,9 +159,9 @@ layers_(layers)
 void VTTexture2D::upload_to(RenderContext const& context) const {
   RenderContext::Texture ctex{};
   {
-    
+    /*
     ctex.texture = context.render_device->create_texture_2d(
-        math::vec2ui(width_, height_), scm::gl::FORMAT_RGBA_8UI);
+        math::vec2ui(width_, height_), scm::gl::FORMAT_RGBA_8UI);*/
     
     initialize_index_texture(context, 0);
 
