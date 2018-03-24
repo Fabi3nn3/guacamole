@@ -148,11 +148,8 @@ namespace gua {
   void VirtualTexturingRenderer::update_index_texture(gua::RenderContext const& ctx,uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu) {
     //std::cout << "hello :)";
     auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
-    auto phy_tex = TextureDatabase::instance()->lookup("gua_physical_texture_2d");
-    //ctx.physical_texture
 
     for( auto const& vt_ptr : vector_of_vt_ptr ) {
-      if(vt_ptr != phy_tex){
       //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
       uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
       
@@ -160,11 +157,6 @@ namespace gua {
       scm::math::vec3ui _index_texture_dimension = scm::math::vec3ui(size_index_texture, size_index_texture, 1);
 
       vt_ptr->update_sub_data(ctx, scm::gl::texture_region(origin, _index_texture_dimension), 0, scm::gl::FORMAT_RGBA_8UI, buf_cpu);
-      }
-      else
-      {
-        std::cout << "Phy tex exists";
-      }
     }
 
   }

@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
 
   uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
-//    auto *cut_update = &vt::CutUpdate::get_instance();
-//    cut_update->start();
+    auto *cut_update = &vt::CutUpdate::get_instance();
+    cut_update->start();
 
     auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
     auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();

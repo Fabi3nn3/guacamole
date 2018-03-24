@@ -105,36 +105,6 @@ scm::gl::data_format PhysicalTexture2D::get_tex_format()
 }                                                        
 
 
-
-  void PhysicalTexture2D::update(RenderContext const& context) const {
-
-    std::cout << "Performing cut update for VT2D!\n";
-
-    /*std::vector<unsigned char> rand_buffer(_index_texture_dimension[0] * _index_texture_dimension[1] * 4);
-
-    for(unsigned int y_idx = 0; y_idx < _index_texture_dimension[1]; ++y_idx) {
-      for(unsigned int x_idx = 0; x_idx < _index_texture_dimension[0]; ++x_idx) {
-        unsigned int pixel_offset = ( y_idx * _index_texture_dimension[0] + x_idx ) * 4;
-
-        rand_buffer[ pixel_offset + 0 ] = std::rand() % 255;
-        rand_buffer[ pixel_offset + 1 ] = std::rand() % 255;
-        rand_buffer[ pixel_offset + 2 ] = std::rand() % 255;
-        rand_buffer[ pixel_offset + 3 ] = std::rand() % 255;
-
-      }
-    }
-
-    scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
-    scm::math::vec3ui dimensions = scm::math::vec3ui(_index_texture_dimension[0], _index_texture_dimension[1], 1); 
-    update_sub_data(context, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&rand_buffer[0]) );
-
-    //delete cut_update;
-    
-*/
-  };
-
-
-
   //initialize(*context);
 /*
   if (ctex.texture) {
