@@ -109,21 +109,21 @@ namespace gua {
             {
                  if(mem_slot_updated == nullptr)
                  {
-                     //std::cerr << "Mem slot at " << position_slot_updated.second << " is null" << std::endl;
+                     std::cerr << "Mem slot at " << position_slot_updated.second << " is null" << std::endl;
                  }
                  else
                  {
                   if(0 == mem_slot_updated->position) {
                     std::cout << "Slot 0 was in apply cut update\n";
                   }
-                  /*
-                     std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
+                  
+                     /*std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
                      std::cerr << "Mem slot #" << mem_slot_updated->position << std::endl;
                      std::cerr << "Tile id: " << mem_slot_updated->tile_id << std::endl;
                      std::cerr << "Locked: " << mem_slot_updated->locked << std::endl;
                      std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
-                     std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
-                  */
+                     std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;*/
+                  
                  }
                  //throw std::runtime_error("updated mem slot inconsistency");
             } else {

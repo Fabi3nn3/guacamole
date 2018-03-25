@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
 
   uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
-    auto *cut_update = &vt::CutUpdate::get_instance();
-    cut_update->start();
+    //auto *cut_update = &vt::CutUpdate::get_instance();
+    //cut_update->start();
 
     auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
     auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
@@ -189,6 +189,22 @@ int main(int argc, char** argv) {
   camera->config.set_scene_graph_name("main_scenegraph");
   camera->config.set_output_window_name("main_window");
   camera->config.set_enable_stereo(false);
+
+  //für Pass
+  /*
+  //aus NormalizationSubRenderer
+  RenderContext const& ctx(pipe.get_context());
+  auto& target = *pipe.current_viewstate().target;
+  //was macht context_guard?
+  scm::gl::quad_geometry_ptr      fullscreen_quad_;
+  if(!fullscreen_quad_) {
+      fullscreen_quad_.reset(new scm::gl::quad_geometry(ctx.render_device, 
+                                                scm::math::vec2(-1.0f, -1.0f), scm::math::vec2(1.0f, 1.0f )));
+    }
+
+  bool write_depth = true;
+  target.bind(ctx, write_depth);
+  */
 
   auto pipe = std::make_shared<gua::PipelineDescription>();
   pipe->add_pass(std::make_shared<gua::TriMeshPassDescription>());
