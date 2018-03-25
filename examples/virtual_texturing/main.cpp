@@ -124,8 +124,7 @@ int main(int argc, char** argv) {
 
   //std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
 
-
-  vt::VTConfig::get_instance().define_size_physical_texture(50, 4096);
+  vt::VTConfig::get_instance().define_size_physical_texture(8, 4096);
 
   uint32_t data_id = vt::CutDatabase::get_instance().register_dataset(file_atlas);
   uint16_t view_id = vt::CutDatabase::get_instance().register_view();
@@ -138,15 +137,13 @@ int main(int argc, char** argv) {
 
     auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
     auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
-    //uint64_t color_cut_id = (((uint64_t)color_data_id) << 32) | ((uint64_t)view_id << 16) | ((uint64_t)context_id);
-    uint64_t color_cut_id = 0;
-    //uint32_t max_depth_level_color = (*vt::CutDatabase::get_instance().get_cut_map())[color_cut_id]->get_atlas()->getDepth() - 1;
-    scm::math::vec2ui phy_tex_dim = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
-    uint16_t tile_size = vt::VTConfig::get_instance().get_size_tile();
-    uint16_t tile_padding = vt::VTConfig::get_instance().get_size_padding();
-    uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[color_cut_id]->get_atlas()->getDepth() - 1);
+
+    int max_depth_level = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1;
+    scm::math::vec2ui phy_tex_dim = scm::math::vec2ui(phys_width, phys_width);
+    unsigned int tile_size = vt::VTConfig::get_instance().get_size_tile();
+    unsigned int tile_padding = vt::VTConfig::get_instance().get_size_padding();
+    unsigned int size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
     scm::math::vec2ui idx_tex_dim = scm::math::vec2ui(size_index_texture, size_index_texture);
-    int max_depth_level_color = 9;
     std::cout << "idx_tex_dim: "<<idx_tex_dim;
 
     auto vt_material(load_mat("data/materials/VirtualTexturing.gmd"));
@@ -157,11 +154,11 @@ int main(int argc, char** argv) {
     vt_material->set_uniform("ColorMap", std::string(file_atlas));
     std::string phy_tex_name = "gua_physical_texture_2d";
     vt_material->set_uniform("PhysicalTexture2D", std::string(phy_tex_name));
-    vt_material->set_uniform("max_level_color", max_depth_level_color);
-    vt_material->set_uniform("tile_size", scm::math::vec2ui(tile_size, tile_size) );
-    vt_material->set_uniform("tile_padding", scm::math::vec2ui(tile_padding, tile_padding) );
-    vt_material->set_uniform("physical_texture_dim",phy_tex_dim);
-    vt_material->set_uniform("index_dim_color",idx_tex_dim);
+    vt_material->set_uniform("max_level", max_depth_level);
+    vt_material->set_uniform("tile_size", scm::math::vec2ui(tile_size, tile_size));
+    vt_material->set_uniform("tile_padding", scm::math::vec2ui(tile_padding, tile_padding));
+    vt_material->set_uniform("physical_texture_dim", phy_tex_dim);
+    vt_material->set_uniform("index_dim", idx_tex_dim);
 
 
     auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
