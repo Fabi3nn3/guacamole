@@ -163,22 +163,12 @@ namespace gua {
 
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
     auto phy_tex_ptr = ctx.physical_texture;
-  
-      /*if( 0 == slot_position) {
-        std::cout << "Trying to upload 1 root level\n";
-      }else {
-        std::cout << "tr\n";
-      }*/
 
     if(phy_tex_ptr == nullptr) {
       //std::cout << "physical_context is nullptr\n";
     } 
     else 
     {
-
-      /*if( 0 == slot_position) {
-        std::cout << "Trying to upload root level\n";
-      }*/
       size_t slots_per_texture = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width();
       size_t layer = slot_position / slots_per_texture;
       size_t rel_slot_position = slot_position - layer * slots_per_texture;
@@ -188,18 +178,7 @@ namespace gua {
       scm::math::vec3ui origin = scm::math::vec3ui((uint32_t)x_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)y_tile * vt::VTConfig::get_instance().get_size_tile(), (uint32_t)layer);
       scm::math::vec3ui dimensions = scm::math::vec3ui(vt::VTConfig::get_instance().get_size_tile(), vt::VTConfig::get_instance().get_size_tile(), 1);
 
-
-      //std::cout << "yeah!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
-
-      //std::cout << "origin: " << origin << ", " <<"dimensions: " << dimensions << "\n";
-
       ctx.render_context->update_sub_texture(phy_tex_ptr, scm::gl::texture_region(origin, dimensions), 0, PhysicalTexture2D::get_tex_format(), buf_texel);
-      //phy_tex_ptr->update_sub_texture(ctx, scm::gl::texture_region(origin, dimensions), 0, PhysicalTexture2D::get_tex_format(), buf_texel);
-      //std::cout << "Done updating the physical texture\n";
-      //update_sub_data(ctx, scm::gl::texture_region(origin, dimensions), 0, scm::gl::FORMAT_RGBA_8UI, (void*)(&red_buffer[0]) );
-
-
-
     }
 
   }
@@ -217,7 +196,8 @@ namespace gua {
 
     ctx.render_context->sync();
 
-    //_cut_update->feedback(_feedback_cpu_buffer);
+     auto *_cut_update = &vt::CutUpdate::get_instance();
+    _cut_update->feedback(_feedback_cpu_buffer);
 
     ctx.render_context->unmap_buffer(_feedback_storage);
     ctx.render_context->clear_buffer_data(_feedback_storage, FORMAT_R_32UI, nullptr);
@@ -252,6 +232,11 @@ namespace gua {
       
       //apply cutUpdate with dummy ids = all zero
       apply_cut_update(ctx,0,0);
+
+      _size_feedback = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_layers();
+      _feedback_storage = scm_device->create_buffer(scm::gl::BIND_STORAGE_BUFFER, scm::gl::USAGE_DYNAMIC_READ, _size_feedback * size_of_format(scm::gl::FORMAT_R_32UI));
+
+      scm_context->bind_storage_buffer(_feedback_storage, 0);
 
       auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
       auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();

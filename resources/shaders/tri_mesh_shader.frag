@@ -5,6 +5,8 @@
 @include "common/gua_fragment_shader_input.glsl"
 @include "common/gua_camera_uniforms.glsl"
 
+layout(std430, binding = 0) buffer out_feedback { uint[] out_feedback_values; };
+
 uniform float gua_texel_width;
 uniform float gua_texel_height;
 
