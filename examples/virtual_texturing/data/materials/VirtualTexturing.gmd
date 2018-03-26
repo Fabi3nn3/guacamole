@@ -55,11 +55,16 @@
           gua_metalness = 0.0;
           gua_emissivity = 1.0;
 
-          gua_color = (texture(sampler2DArray(PhysicalTexture2D), vec3(physical_texture_coordinates, texture_coordinates.z)).rgb + vec3(0.0, 1.0 * (float(current_level) / max_level), float(texture_coordinates.z) / 2)) * 0.5;
-          //gua_color = texture(sampler2DArray(PhysicalTexture2D), texture_coordinates).rgb;
+          vec3 c = (texture(sampler2DArray(PhysicalTexture2D), vec3(physical_texture_coordinates, texture_coordinates.z)).rgb + vec3(0.0, 1.0 * (float(current_level) / max_level), float(texture_coordinates.z) / 2)) * 0.5;
 
           uint one_d_feedback_ssbo_index = base_xy_offset.x + base_xy_offset.y * physical_texture_dim.x + idx_quadruple.w * physical_texture_dim.x * physical_texture_dim.y;
           atomicAdd(out_feedback_values[one_d_feedback_ssbo_index], 1);
+
+          gua_color = c;
+          //gua_color = (texture(sampler2DArray(PhysicalTexture2D), vec3(physical_texture_coordinates, texture_coordinates.z)).rgb + vec3(0.0, 1.0 * (float(current_level) / max_level), float(texture_coordinates.z) / 2)) * 0.5;
+          //gua_color = (texture(sampler2DArray(PhysicalTexture2D), vec3(physical_texture_coordinates, texture_coordinates.z)).rgb;
+          //gua_color = texture(sampler2DArray(PhysicalTexture2D), texture_coordinates).rgb;
+
         }
       ",
       "uniforms" :

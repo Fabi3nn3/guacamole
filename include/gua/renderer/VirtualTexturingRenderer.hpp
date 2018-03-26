@@ -55,7 +55,8 @@ namespace gua {
     void apply_cut_update(gua::RenderContext const& ctx, uint64_t cut_id, uint16_t ctx_id);
     void update_index_texture(gua::RenderContext const& ctx, uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu);
     void update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position);
-    void collect_feedback(gua::RenderContext const& ctx, uint16_t context_id);
+    void collect_feedback(gua::RenderContext const& ctx);
+    
 
   private:  //shader related auxiliary methods
     //not sure about this one

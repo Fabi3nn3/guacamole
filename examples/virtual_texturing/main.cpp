@@ -132,6 +132,7 @@ int main(int argc, char** argv) {
 
   uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
+
     //auto *cut_update = &vt::CutUpdate::get_instance();
     //cut_update->start();
 
@@ -239,10 +240,10 @@ int main(int argc, char** argv) {
   window->open();
 
 
-    auto *cutupdate = &vt::CutUpdate::get_instance();
-    cutupdate->start();
-    //_cut_update_started = true;
-
+  auto *cutupdate = &vt::CutUpdate::get_instance();
+  cutupdate->start();
+  //_cut_update_started = true;
+ 
   gua::Renderer renderer;
 
   //application loop

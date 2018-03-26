@@ -184,7 +184,7 @@ namespace gua {
   }
 
   //Fkt die Feedback aus FragmentShader verwertet
-  void VirtualTexturingRenderer::collect_feedback(gua::RenderContext const& ctx, uint16_t context_id){
+  void VirtualTexturingRenderer::collect_feedback(gua::RenderContext const& ctx){
     using namespace scm::math;
     using namespace scm::gl;
 
@@ -235,14 +235,19 @@ namespace gua {
 
       _size_feedback = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_layers();
       _feedback_storage = scm_device->create_buffer(scm::gl::BIND_STORAGE_BUFFER, scm::gl::USAGE_DYNAMIC_READ, _size_feedback * size_of_format(scm::gl::FORMAT_R_32UI));
+      _feedback_cpu_buffer = new uint32_t[_size_feedback];
 
       scm_context->bind_storage_buffer(_feedback_storage, 0);
 
       auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
       auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
-      std::vector<uint32_t> feedback_buffer(phys_width * phys_width * phys_layers, /*UINT32_MAX*/10000000);
 
-      vt::CutUpdate::get_instance().feedback(&feedback_buffer[0]);
+      collect_feedback(ctx);
+      //std::cout << "hallo aus VTRenderer\n";
+
+      //std::vector<uint32_t> feedback_buffer(phys_width * phys_width * phys_layers, /*UINT32_MAX*/10000000);
+
+      //vt::CutUpdate::get_instance().feedback(&feedback_buffer[0]);
 
 
       //retrieve virtual textures to update them
