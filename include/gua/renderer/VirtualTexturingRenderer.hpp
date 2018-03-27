@@ -76,9 +76,8 @@ namespace gua {
     scm::gl::sampler_state_ptr                                                        _filter_nearest;
     scm::gl::sampler_state_ptr                                                        _filter_linear;
     bool                                                                              _cut_update_started;
-    size_t                                                                            _size_feedback;
-    scm::gl::buffer_ptr                                                               _feedback_storage;
-    uint32_t                                                                         *_feedback_cpu_buffer;
+ 
+    
     //vt::CutUpdate                                                                     *_cut_update;
     //scm::math::vec2ui                                                                 _index_texture_dimension;
     //scm::gl::texture_2d_ptr                                                           _index_texture;

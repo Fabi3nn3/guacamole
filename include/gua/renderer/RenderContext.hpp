@@ -178,6 +178,9 @@ struct GUA_DLL RenderContext {
 
 
   mutable scm::gl::texture_image_ptr physical_texture = nullptr;
+  mutable uint32_t *feedback_cpu_buffer;
+  mutable size_t size_feedback;
+  mutable scm::gl::buffer_ptr feedback_storage;
 
   /**
   * Texture arrays associated with this contect

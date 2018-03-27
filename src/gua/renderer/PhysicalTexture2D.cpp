@@ -55,12 +55,23 @@ PhysicalTexture2D::PhysicalTexture2D(std::string const& file,
   void PhysicalTexture2D::initialize_physical_texture(RenderContext const& ctx) const{
     std::cout << "phy tex wohoo!!!!!";
     RenderContext::Texture ctex;
+    auto scm_device = ctx.render_device;
+    auto scm_context = ctx.render_context;
     
     _physical_texture_dimension = scm::math::vec2ui( vt::VTConfig::get_instance().get_phys_tex_px_width(),  vt::VTConfig::get_instance().get_phys_tex_px_width());
     std::cout << "Phys texture dimensions: " << _physical_texture_dimension[0] << " " << _physical_texture_dimension[1] << "\n";
 
     //ctex.physical_texture = render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 1, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
     ctex.texture = ctx.render_device->create_texture_2d(_physical_texture_dimension, get_tex_format(), 1, vt::VTConfig::get_instance().get_phys_tex_layers() +1) ;
+
+
+      //create feedback buffer and register with context 
+    ctx.size_feedback = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_layers();
+    ctx.feedback_storage = scm_device->create_buffer(scm::gl::BIND_STORAGE_BUFFER, scm::gl::USAGE_DYNAMIC_READ, ctx.size_feedback * size_of_format(scm::gl::FORMAT_R_32UI));
+    ctx.feedback_cpu_buffer = new uint32_t[ctx.size_feedback];
+
+    scm_context->bind_storage_buffer(ctx.feedback_storage, 20);
+
     std::cout << "done creating physical texture\n";
 
     if (ctex.texture)

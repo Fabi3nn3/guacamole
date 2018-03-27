@@ -188,19 +188,23 @@ namespace gua {
     using namespace scm::math;
     using namespace scm::gl;
 
-    _size_feedback = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_layers();
+    uint32_t *feedback = (uint32_t *)ctx.render_context->map_buffer(ctx.feedback_storage, ACCESS_READ_ONLY);
 
-    uint32_t *feedback = (uint32_t *)ctx.render_context->map_buffer(_feedback_storage, ACCESS_READ_ONLY);
-
-    memcpy(_feedback_cpu_buffer, feedback, _size_feedback * size_of_format(FORMAT_R_32UI));
+    memcpy(ctx.feedback_cpu_buffer, feedback, ctx.size_feedback * size_of_format(FORMAT_R_32UI));
 
     ctx.render_context->sync();
 
-     auto *_cut_update = &vt::CutUpdate::get_instance();
-    _cut_update->feedback(_feedback_cpu_buffer);
+    for (int i = 0; i < 10; ++i)
+    {
+      std::cout << feedback[i] << " "; 
+    }
+    std::cout << "\n";
 
-    ctx.render_context->unmap_buffer(_feedback_storage);
-    ctx.render_context->clear_buffer_data(_feedback_storage, FORMAT_R_32UI, nullptr);
+     auto *_cut_update = &vt::CutUpdate::get_instance();
+    _cut_update->feedback(ctx.feedback_cpu_buffer);
+
+    ctx.render_context->unmap_buffer(ctx.feedback_storage);
+    ctx.render_context->clear_buffer_data(ctx.feedback_storage, FORMAT_R_32UI, nullptr);
   }
 
 
@@ -233,26 +237,9 @@ namespace gua {
       //apply cutUpdate with dummy ids = all zero
       apply_cut_update(ctx,0,0);
 
-      _size_feedback = vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_tile_width() * vt::VTConfig::get_instance().get_phys_tex_layers();
-      _feedback_storage = scm_device->create_buffer(scm::gl::BIND_STORAGE_BUFFER, scm::gl::USAGE_DYNAMIC_READ, _size_feedback * size_of_format(scm::gl::FORMAT_R_32UI));
-      _feedback_cpu_buffer = new uint32_t[_size_feedback];
-
-      scm_context->bind_storage_buffer(_feedback_storage, 0);
-
-      auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
-      auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
-
       collect_feedback(ctx);
-      //std::cout << "hallo aus VTRenderer\n";
 
-      //std::vector<uint32_t> feedback_buffer(phys_width * phys_width * phys_layers, /*UINT32_MAX*/10000000);
-
-      //vt::CutUpdate::get_instance().feedback(&feedback_buffer[0]);
-
-
-      //retrieve virtual textures to update them
-
-
+      
       // if(lamure_cut_update is not running -> run)
 
       //with lamure: start_reading_cut

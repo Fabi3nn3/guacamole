@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
     graph.add_node("/transform", quad);
 
 
-   quad->scale(1.5f);
+   quad->scale(5.0f);
   //setup rendering pipeline and window
   auto resolution = gua::math::vec2ui(1920, 1080);
 
