@@ -87,16 +87,11 @@ int main(int argc, char** argv) {
 
   //add mouse interaction
   gua::utils::Trackball trackball(0.01, 0.002, 0.2);
-  /*scm::gl::trackball_manipulator trackball;
-  trackball.transform_matrix()*scm::math::make_translation(0.01f, 0.002f, 0.2f);
-  trackball.dolly(0.2f);*/
 
   float dolly_sens = 1.5f;
   gua::math::vec2 trackball_init_pos(0.f);
   gua::math::vec2 last_mouse_pos(0.f);
   int button_state = -1;
-
-
 
   auto load_mat = [](std::string const& file){
     auto desc(std::make_shared<gua::MaterialShaderDescription>());
@@ -108,21 +103,18 @@ int main(int argc, char** argv) {
 
   gua::TriMeshLoader loader;
 
-  //  std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template.ini");
   std::string file_config = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/configuration_template_gua_test.ini");
-  std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_stitch_86400x43200_256x256_p1_rgb_packed.atlas");
+  std::string file_atlas = std::string("/mnt/terabytes_of_textures/FINAL_DEMO_DATA/earth_colour_86400x43200_256x256_1_rgb.atlas");
 
   vt::VTConfig::CONFIG_PATH = file_config;
   std::cout << "CONFIG PATH IS: " << vt::VTConfig::CONFIG_PATH << "\n";
 
-  //GPU Infos wrong - why? answer: don't use plain gl in scm/gua! -> look for wrappers
+  //GPU Infos -> Use Wrappers
    //GLint max_tex_layers;
    //glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_tex_layers);
 
    //GLint max_tex_px_width_gl;
    //glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_px_width_gl);
-
-  //std::cout << "Max PhyTex Layers: " << max_tex_layers << " Max px width: " << max_tex_px_width_gl << "\n";
 
   vt::VTConfig::get_instance().define_size_physical_texture(8, 4096);
 
@@ -132,47 +124,39 @@ int main(int argc, char** argv) {
 
   uint64_t cut_id = vt::CutDatabase::get_instance().register_cut(data_id, view_id, primary_context_id);
 
+  auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
+  auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
 
-    //auto *cut_update = &vt::CutUpdate::get_instance();
-    //cut_update->start();
+  int max_depth_level = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1;
+  scm::math::vec2ui phy_tex_dim = scm::math::vec2ui(phys_width, phys_width);
+  unsigned int tile_size = vt::VTConfig::get_instance().get_size_tile();
+  unsigned int tile_padding = vt::VTConfig::get_instance().get_size_padding();
+  unsigned int size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
+  scm::math::vec2ui idx_tex_dim = scm::math::vec2ui(size_index_texture, size_index_texture);
+  std::cout << "idx_tex_dim: "<<idx_tex_dim;
 
-    auto phys_width = vt::VTConfig::get_instance().get_phys_tex_tile_width();
-    auto phys_layers = vt::VTConfig::get_instance().get_phys_tex_layers();
+  auto vt_material(load_mat("data/materials/VirtualTexturing.gmd"));
 
-    int max_depth_level = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1;
-    scm::math::vec2ui phy_tex_dim = scm::math::vec2ui(phys_width, phys_width);
-    unsigned int tile_size = vt::VTConfig::get_instance().get_size_tile();
-    unsigned int tile_padding = vt::VTConfig::get_instance().get_size_padding();
-    unsigned int size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
-    scm::math::vec2ui idx_tex_dim = scm::math::vec2ui(size_index_texture, size_index_texture);
-    std::cout << "idx_tex_dim: "<<idx_tex_dim;
-
-    auto vt_material(load_mat("data/materials/VirtualTexturing.gmd"));
-
-    //happens in set_uniform too :)
-    //gua::TextureDatabase::instance()->load(file_atlas);
-
-    vt_material->set_uniform("ColorMap", std::string(file_atlas));
-    std::string phy_tex_name = "gua_physical_texture_2d";
-    vt_material->set_uniform("PhysicalTexture2D", std::string(phy_tex_name));
-    vt_material->set_uniform("max_level", max_depth_level);
-    vt_material->set_uniform("tile_size", scm::math::vec2ui(tile_size, tile_size));
-    vt_material->set_uniform("tile_padding", scm::math::vec2ui(tile_padding, tile_padding));
-    vt_material->set_uniform("physical_texture_dim", phy_tex_dim);
-    vt_material->set_uniform("index_dim", idx_tex_dim);
+  vt_material->set_uniform("ColorMap", std::string(file_atlas));
+  std::string phy_tex_name = "gua_physical_texture_2d";
+  vt_material->set_uniform("PhysicalTexture2D", std::string(phy_tex_name));
+  vt_material->set_uniform("max_level", max_depth_level);
+  vt_material->set_uniform("tile_size", scm::math::vec2ui(tile_size, tile_size));
+  vt_material->set_uniform("tile_padding", scm::math::vec2ui(tile_padding, tile_padding));
+  vt_material->set_uniform("physical_texture_dim", phy_tex_dim);
+  vt_material->set_uniform("index_dim", idx_tex_dim);
 
 
-    auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
-    auto quad(loader.create_geometry_from_file(
-        "quad", "data/objects/quad.obj",
-        vt_material,
-        gua::TriMeshLoader::NORMALIZE_POSITION |
-        gua::TriMeshLoader::NORMALIZE_SCALE) );
+  auto transform = graph.add_node<gua::node::TransformNode>("/", "transform");
+  auto quad(loader.create_geometry_from_file(
+      "quad", "data/objects/quad.obj",
+      vt_material,
+      gua::TriMeshLoader::NORMALIZE_POSITION |
+      gua::TriMeshLoader::NORMALIZE_SCALE) );
 
-    graph.add_node("/transform", quad);
+  graph.add_node("/transform", quad);
 
-
-   quad->scale(5.0f);
+  quad->scale(1.6f);
   //setup rendering pipeline and window
   auto resolution = gua::math::vec2ui(1920, 1080);
 
@@ -188,22 +172,6 @@ int main(int argc, char** argv) {
   camera->config.set_output_window_name("main_window");
   camera->config.set_enable_stereo(false);
 
-  //für Pass
-  /*
-  //aus NormalizationSubRenderer
-  RenderContext const& ctx(pipe.get_context());
-  auto& target = *pipe.current_viewstate().target;
-  //was macht context_guard?
-  scm::gl::quad_geometry_ptr      fullscreen_quad_;
-  if(!fullscreen_quad_) {
-      fullscreen_quad_.reset(new scm::gl::quad_geometry(ctx.render_device, 
-                                                scm::math::vec2(-1.0f, -1.0f), scm::math::vec2(1.0f, 1.0f )));
-    }
-
-  bool write_depth = true;
-  target.bind(ctx, write_depth);
-  */
-
   auto pipe = std::make_shared<gua::PipelineDescription>();
   pipe->add_pass(std::make_shared<gua::TriMeshPassDescription>());
   pipe->add_pass(std::make_shared<gua::VirtualTexturingPassDescription>());
@@ -216,7 +184,7 @@ int main(int argc, char** argv) {
   pipe->get_resolve_pass()->tone_mapping_exposure(5.f);
 
   pipe->get_resolve_pass()->background_mode(gua::ResolvePassDescription::BackgroundMode::SKYMAP_TEXTURE);
-  //pipe->get_resolve_pass()->background_texture(file_atlas);
+
 
   //init window and window behaviour
   auto window = std::make_shared<gua::GlfwWindow>();
@@ -232,18 +200,14 @@ int main(int argc, char** argv) {
     screen->data.set_size(gua::math::vec2(0.001 * new_size.x, 0.001 * new_size.y));
   });
 
-
-
   window->on_button_press.connect(
       std::bind(mouse_button, std::ref(trackball), std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3));
   window->open();
 
-
   auto *cutupdate = &vt::CutUpdate::get_instance();
   cutupdate->start();
-  //_cut_update_started = true;
- 
+
   gua::Renderer renderer;
 
   //application loop

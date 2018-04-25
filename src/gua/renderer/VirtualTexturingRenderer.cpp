@@ -64,6 +64,7 @@
 
 
 #include <boost/assign/list_of.hpp>
+      #include <typeinfo>
 
 namespace gua {
 
@@ -117,15 +118,15 @@ namespace gua {
                     std::cout << "Slot 0 was in apply cut update\n";
                   }
                   
-                     /*std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
+                     std::cerr << "Mem slot at " << position_slot_updated.second << std::endl;
                      std::cerr << "Mem slot #" << mem_slot_updated->position << std::endl;
                      std::cerr << "Tile id: " << mem_slot_updated->tile_id << std::endl;
                      std::cerr << "Locked: " << mem_slot_updated->locked << std::endl;
                      std::cerr << "Updated: " << mem_slot_updated->updated << std::endl;
-                     std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;*/
+                     std::cerr << "Pointer valid: " << (mem_slot_updated->pointer != nullptr) << std::endl;
                   
                  }
-                 //throw std::runtime_error("updated mem slot inconsistency");
+                 throw std::runtime_error("updated mem slot inconsistency");
             } else {
 
 
@@ -136,23 +137,18 @@ namespace gua {
           cut_db->stop_reading_cut(cut_entry.first);
           
         }
-       /* else
-        {
-            cut_db->stop_reading_cut(cut_entry.first);
-        }*/
       }
         cut_db->stop_reading();
         render_context->sync();
   }
 
   void VirtualTexturingRenderer::update_index_texture(gua::RenderContext const& ctx,uint64_t cut_id, uint32_t dataset_id, uint16_t context_id, const uint8_t *buf_cpu) {
-    //std::cout << "hello :)";
+    
+    uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
+    
     auto vector_of_vt_ptr = TextureDatabase::instance()->get_virtual_textures();
 
     for( auto const& vt_ptr : vector_of_vt_ptr ) {
-      //uint32_t size_index_texture = (*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_size_index_texture();
-      uint32_t size_index_texture = (uint32_t)vt::QuadTree::get_tiles_per_row((*vt::CutDatabase::get_instance().get_cut_map())[cut_id]->get_atlas()->getDepth() - 1);
-      
       scm::math::vec3ui origin = scm::math::vec3ui(0, 0, 0);
       scm::math::vec3ui _index_texture_dimension = scm::math::vec3ui(size_index_texture, size_index_texture, 1);
 
@@ -162,10 +158,11 @@ namespace gua {
   }
 
   void VirtualTexturingRenderer::update_physical_texture_blockwise(gua::RenderContext const& ctx, uint16_t context_id, const uint8_t *buf_texel, size_t slot_position) {
+
     auto phy_tex_ptr = ctx.physical_texture;
 
     if(phy_tex_ptr == nullptr) {
-      //std::cout << "physical_context is nullptr\n";
+      std::cout << "physical_context is nullptr\n";
     } 
     else 
     {
@@ -183,7 +180,6 @@ namespace gua {
 
   }
 
-  //Fkt die Feedback aus FragmentShader verwertet
   void VirtualTexturingRenderer::collect_feedback(gua::RenderContext const& ctx){
     using namespace scm::math;
     using namespace scm::gl;
@@ -194,13 +190,7 @@ namespace gua {
 
     ctx.render_context->sync();
 
-    for (int i = 0; i < 10; ++i)
-    {
-      std::cout << feedback[i] << " "; 
-    }
-    std::cout << "\n";
-
-     auto *_cut_update = &vt::CutUpdate::get_instance();
+    auto *_cut_update = &vt::CutUpdate::get_instance();
     _cut_update->feedback(ctx.feedback_cpu_buffer);
 
     ctx.render_context->unmap_buffer(ctx.feedback_storage);
@@ -213,10 +203,14 @@ namespace gua {
 
 
     RenderContext const& ctx(pipe.get_context());
+    ctx.render_context->sync();
+    apply_cut_update(ctx,0,0);
+    collect_feedback(ctx);
+    ctx.render_context->sync();
 
-    if(true) {
-    //if(nullptr != ctx.physical_texture) {
 
+    if(false) {
+   
 
       auto scm_device = ctx.render_device;
       auto scm_context = ctx.render_context;
@@ -233,31 +227,6 @@ namespace gua {
 
       std::string cpu_query_name_plod_total = "CPU: Camera uuid: " + std::to_string(pipe.current_viewstate().viewpoint_uuid) + " / LodPass";
       pipe.begin_cpu_query(cpu_query_name_plod_total);
-      
-      //apply cutUpdate with dummy ids = all zero
-      apply_cut_update(ctx,0,0);
-
-      collect_feedback(ctx);
-
-      
-      // if(lamure_cut_update is not running -> run)
-
-      //with lamure: start_reading_cut
-
-      //with gua: get_front_idx (index texture cpu representation as uin8_t*) (gives you the lamure::vt::ren::Cut*)
-
-      //with gua: get_physical texture mem slots from cut
-
-      // either: update GPU representation directly similar to lamure, but with gua resources (in your VTTexture class)
-      // OR: copy all the cpu memory you received into own CPU buffers in the VTTexture object
-
-      // with lamure: stop reading cut
-
-      // if you did not update the GPU textures before: update them now with the copied CPU representation
-
-
-      //std::cout << "Render Frame in VT-Renderer\n";
-
       pipe.end_cpu_query(cpu_query_name_plod_total); 
       
       //dispatch cut updates
